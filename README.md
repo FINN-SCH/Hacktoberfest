@@ -1,77 +1,74 @@
-# Voice Language Tutor
+# Voice-Only AI Language Tutor & Conversation Coach
 
-A voice-first language tutor powered entirely by **open-weight models**. Talk to it hands-free. It corrects your grammar out loud as you go, saves the full conversation as a transcript, rates the session, and turns your own past mistakes into a personalised quiz.
+A real-time spoken language conversation coach and tutor powered by open-weight models that analyzes what you say, corrects grammar and vocabulary mistakes both visually and verbally in natural speech, saves conversation history, and turns your actual mistakes into personalized interactive practice quizzes.
 
-Built for the Hacktoberfest hackathon (theme: open-source / open-weight models).
+Built for the Hacktoberfest hackathon. See [`PLAN.md`](./PLAN.md) and [`gemini_plan.md`](./gemini_plan.md) for architectural plans.
 
-> Status: planning complete, implementation starting. See [PLAN.md](PLAN.md) for the full technical plan.
+## ✨ Features
 
-## What it does
+- **End-to-End Voice Pipeline**:
+  - **Speech-to-Text (STT)**: High-precision verbatim speech transcription using **Faster-Whisper (Large-v3-Turbo)** (or Groq Whisper API). Tuned specifically for language learners to capture phonetic grammar errors verbatim without artificial autocorrection.
+  - **Conversational AI & Tutor Engine**: Active language coach powered by open-weight LLMs (`qwen3.8-fast` / local SGLang or Groq `gpt-oss-120b`). Identifies mistakes against a predefined grammar taxonomy, verbally explains corrections in natural speech, and keeps dialogues engaging.
+  - **Text-to-Speech (TTS)**: High-fidelity natural voice streaming via Edge-TTS / Resemble Chatterbox.
+- **Immediate Verbal & Visual Feedback**:
+  - Spoken feedback: The coach directly explains the correction in the speech output before continuing the conversation.
+  - Visual cards: Structured mistake cards tagged by grammar topic (e.g., *Subject-Verb Agreement*, *Irregular Past Forms*).
+  - Feedback controls: Mark false positives as **"Not a mistake"** or transcription slips as **"Misheard"**.
+- **Personalized Interactive Practice Quiz**:
+  - Automatically generates dynamic multiple-choice and fill-in-the-blank questions derived strictly from the learner's actual recorded mistakes (*"Practising this because you said: ..."*).
+  - Deterministic grading with immediate explanation and review.
+- **Conversation Scenarios & Levels**:
+  - ☕ Casual Coffee Chat
+  - 💼 Job Interview Practice
+  - 💻 Tech & Software Discussion
+  - ✈️ Travel & Daily Life
+  - 📚 Strict Grammar Drill
+- **Hands-Free / Continuous Dialogue**:
+  - Built-in Voice Activity Detection (VAD) automatically detects when you finish speaking and submits turns seamlessly.
+  - Push-to-Talk via interactive microphone orb or Spacebar.
 
-1. **Talk.** Pick a language (German or English), your level (A1-B2) and a scenario (cafe, job interview, doctor, free talk), then just speak. Voice activity detection decides when you have finished a sentence.
-2. **Get corrected in real time.** After each turn the tutor says one short correction out loud ("Du meinst: Ich bin nach Berlin gegangen.") and then keeps the conversation going. Every detected mistake also appears as a card with an explanation in the language you choose.
-3. **Review your session.** The full transcript is saved, with three ratings, each backed by evidence:
-   - **Grammar**: computed from the corrections you saw, not a second guess by the model.
-   - **Vocabulary**: rubric-based, with quoted examples from what you said.
-   - **Fluency**: speaking rate and pauses.
-4. **Practise your weaknesses.** A quiz (multiple choice and fill-in) is generated from the mistakes you actually made: *"Practising this because you said ..."*.
-5. **See the big picture.** The **Analysis** tab tracks you across all sessions:
-   - progress over sessions
-   - mistakes you keep repeating
-   - a frequency table of your mistakes by grammar topic (e.g. *Perfekt: haben vs. sein*, *Dative case*)
-   - a written analysis of your strengths and what to work on, refreshed automatically after every session
+## 🚀 Quickstart
 
-Wrong correction? Mark it **Not a mistake**. Speech recognition got you wrong? Mark the turn **Misheard**. Excluded items stop counting toward scores and quizzes.
+### Prerequisites
+- Python 3.10+
+- `ffmpeg` installed on the system (for audio transcoding)
+- CUDA-enabled GPU (optional, falls back gracefully to CPU)
 
-## How it works
+### Installation
 
-```
-Browser (React + Vite + TS)
-  mic -> Silero VAD -> speech segment ----POST /turns----> FastAPI
-                                                            |- STT  : Whisper large-v3        (Groq)
-                                                            |- LLM  : gpt-oss-120b, JSON out  (Groq)
-                                                            |- save turn + mistakes           (SQLite)
-  correction cards + reply text   <-------------------------+
-  tutor audio                     <----POST /speech---------- TTS : Chatterbox Multilingual (DeepInfra)
-  (mic paused while the tutor speaks, then listening resumes)
-```
+```bash
+git clone https://github.com/FINN-SCH/Hacktoberfest.git
+cd Hacktoberfest
+git checkout voice-language-tutor
 
-It's a cascaded speech-to-text, LLM, text-to-speech pipeline rather than a single speech-to-speech model. Corrections, transcripts, scoring and quizzes all need text, and a text pipeline lets us check every correction against what was actually said.
-
-## Open-weight models
-
-| Component | Model | License | Served by |
-|---|---|---|---|
-| Speech-to-text | OpenAI Whisper large-v3 | MIT | Groq |
-| Tutor / report / quiz / analysis LLM | OpenAI gpt-oss-120b | Apache 2.0 | Groq |
-| Text-to-speech | Resemble AI Chatterbox Multilingual | MIT | DeepInfra |
-| Voice activity detection | Silero VAD (via `@ricky0123/vad-react`) | MIT | runs in the browser |
-
-Every model client is a thin adapter with its base URL and model ID in `.env`, so any of them can be pointed at another host serving the same open weights.
-
-## Tech stack
-
-- **Frontend:** React, Vite, TypeScript, `@ricky0123/vad-react`, Recharts
-- **Backend:** Python, FastAPI, SQLModel, SQLite
-- **Inference:** Groq (STT + LLM), DeepInfra (TTS), via hosted APIs
-
-## Repository layout (planned)
-
-```
-frontend/   React app: voice capture + VAD, conversation, report, history, quiz, analysis
-backend/    FastAPI app: providers (stt/llm/tts), tutoring, scoring, quizzes, analysis, grammar topics, db
-contracts/  agreed request/response JSON examples (frontend and backend build against these)
-tests/fixtures/  learner utterances and failure cases used by the spikes
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
-## Getting started
+### Running the App
 
-Setup instructions land here once the scaffold exists. You will need:
+```bash
+# Starts the server on port 25565
+python server.py
+```
 
-- Node.js 20+, Python 3.11+
-- A Groq API key and a DeepInfra API key in `backend/.env` (see `.env.example`)
-- Chrome or Edge (microphone + Web Audio)
+Then open your browser at:
+`http://localhost:25565`
 
-## Team
+## 📁 Architecture
 
-4 developers. Ownership and timeline are in [PLAN.md](PLAN.md#team-split-and-timeline).
+```
+.
+├── PLAN.md               # Team Hackathon technical plan & taxonomy
+├── gemini_plan.md        # Architecture & system design plan
+├── server.py             # FastAPI backend (STT, LLM, TTS, Quizzes, Stats)
+├── database.py           # Lightweight SQLite storage for sessions, turns, mistakes & quizzes
+├── topics.py             # Predefined grammar topics taxonomy (EN & DE)
+├── start.sh              # Runner script
+├── requirements.txt      # Python dependencies
+└── static/
+    ├── index.html        # Interactive voice tutor & quiz UI
+    ├── style.css         # Modern dark-mode UI & animated waveform
+    └── app.js            # Web Audio recording, VAD, TTS queue & Quiz engine
+```

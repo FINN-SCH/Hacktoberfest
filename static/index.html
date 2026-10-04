@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Language Coach • English Conversation & Practice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css?v=14">
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="header">
+    <div class="brand-wrap">
+      <div class="brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title">Language Coach</h1>
+        <div class="brand-subtitle">Real-Time English Practice & Feedback</div>
+      </div>
+    </div>
+
+    <!-- Center Segmented View Switcher -->
+    <nav class="nav-segment">
+      <button type="button" class="nav-segment-btn active" id="tab-voice" onclick="switchView('voice')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+        <span>Conversation</span>
+      </button>
+      <button type="button" class="nav-segment-btn" id="tab-quiz" onclick="switchView('quiz')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Practice Quiz</span>
+        <span class="quiz-count-pill" id="quiz-badge" style="display:none;">0</span>
+      </button>
+      <button type="button" class="nav-segment-btn" id="tab-analysis" onclick="switchView('analysis')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Analysis</span>
+      </button>
+      <button type="button" class="nav-segment-btn" id="tab-settings" onclick="switchView('settings')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+    <!-- Header Right Controls -->
+    <div class="header-controls">
+      <div class="control-pill-group">
+        <select id="language-select" class="select-pill" onchange="changeLanguage(this.value)" aria-label="Select Target Practice Language" title="Target Practice Language">
+          <option value="en">🇬🇧 English</option>
+          <option value="de">🇩🇪 Deutsch</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="fr">🇫🇷 Français</option>
+          <option value="it">🇮🇹 Italiano</option>
+        </select>
+
+        <select id="scenario-select" class="select-pill" onchange="changeScenario(this.value)" aria-label="Select Coaching Scenario">
+          <option value="casual">Casual Conversation</option>
+          <option value="interview">Job Interview</option>
+          <option value="tech">Tech & Architecture</option>
+          <option value="travel">Travel & Daily Life</option>
+          <option value="grammar">Grammar Focus</option>
+        </select>
+
+        <select id="voice-select" class="select-pill" onchange="changeVoice(this.value)" aria-label="Select Voice Persona">
+          <option value="en-US-AndrewNeural">Andrew (US)</option>
+          <option value="en-US-AvaNeural">Ava (US)</option>
+          <option value="en-GB-RyanNeural">Ryan (UK)</option>
+          <option value="en-GB-SoniaNeural">Sonia (UK)</option>
+        </select>
+      </div>
+
+      <div class="status-badge" id="status-badge">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Ready</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    
+    <!-- CONVERSATION VIEW -->
+    <div id="view-voice" class="view-panel">
+      
+      <!-- Sleek Voice Trigger Stage -->
+      <section class="orb-stage">
+        <div class="orb-wrapper" id="orb-wrapper" onclick="handleOrbClick()" title="Click or press Spacebar to speak">
+          <button type="button" class="orb-btn" id="orb-btn" aria-label="Microphone">
+            <svg class="orb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+          </button>
+        </div>
+        <div class="orb-label" id="orb-label">Tap to speak</div>
+
+        <!-- Clean Audio Level Visualizer -->
+        <canvas class="visualizer-canvas" id="visualizer" width="360" height="32"></canvas>
+      </section>
+
+      <!-- Active Conversation Card -->
+      <section class="coach-card">
+        <!-- User transcript block -->
+        <div class="turn-row">
+          <div class="turn-meta">
+            <span class="turn-tag user">You</span>
+          </div>
+          <div class="turn-text empty" id="user-transcript">
+            Click the microphone or press Spacebar to start speaking.
+          </div>
+        </div>
+
+        <!-- Live Grammar Feedback Card -->
+        <div class="feedback-card empty" id="feedback-banner">
+          <div class="feedback-top">
+            <div class="feedback-topic" id="feedback-topic-badge">Grammar</div>
+            <div class="feedback-actions" id="feedback-actions" style="display:none;">
+              <button type="button" class="action-chip dismiss" onclick="dismissMistake('not_a_mistake')">Ignore</button>
+              <button type="button" class="action-chip" onclick="dismissMistake('misheard')">Misheard</button>
+            </div>
+          </div>
+          <div class="feedback-body">
+            <span class="feedback-icon" id="feedback-icon">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </span>
+            <div class="feedback-text" id="feedback-text"></div>
+          </div>
+        </div>
+
+        <!-- Coach speech block -->
+        <div class="turn-row coach-row">
+          <div class="turn-meta">
+            <span class="turn-tag coach">Coach</span>
+          </div>
+          <div class="turn-text" id="coach-response">
+            "Hello Jonathan! I am your English conversation coach. What would you like to discuss today?"
+          </div>
+        </div>
+      </section>
+
+      <!-- Topic Starters -->
+      <div class="topic-chips" id="topic-chips">
+        <button type="button" class="topic-chip" onclick="quickSend('Hi! Can you help me practice for a tech job interview?')">Job interview practice</button>
+        <button type="button" class="topic-chip" onclick="quickSend('Yesterday I go to the supermarket and buyed some apples.')">Check my grammar</button>
+        <button type="button" class="topic-chip" onclick="quickSend('What are your top three tips for improving my English fluency?')">Fluency advice</button>
+        <button type="button" class="topic-chip" onclick="quickSend('Let us have a debate about artificial intelligence and system architecture.')">Tech discussion</button>
+      </div>
+
+      <!-- Action Bar -->
+      <div class="controls-bar">
+        <button type="button" class="continuous-btn" id="continuous-btn" onclick="toggleContinuousMode()">
+          <span class="pulse-indicator"></span>
+          <span id="continuous-label">Hands-Free: OFF</span>
+        </button>
+
+        <form class="input-form" onsubmit="handleFormSubmit(event)">
+          <input type="text" class="text-input" id="text-input" placeholder="Type a sentence or prompt to practice..." autocomplete="off">
+          <button type="submit" class="send-btn" aria-label="Send message">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <div class="footer-tip">
+        Press <kbd>Space</kbd> to toggle microphone
+      </div>
+    </div>
+
+    <!-- QUIZ PRACTICE VIEW -->
+    <div id="view-quiz" class="view-panel" style="display: none;">
+      <div class="quiz-container">
+        <div class="quiz-header-banner">
+          <div>
+            <h2 class="quiz-title">Practice Your Weaknesses</h2>
+            <p class="quiz-subtitle">Targeted quiz questions generated strictly from your real conversation mistakes.</p>
+          </div>
+          <button type="button" class="btn-refresh-quiz" onclick="loadQuiz(true)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span>Fresh Questions</span>
+          </button>
+        </div>
+
+        <div id="quiz-loading" class="quiz-status-msg" style="display:none;">
+          <div class="spinner"></div> Generating practice questions from your mistakes...
+        </div>
+
+        <div id="quiz-empty" class="quiz-status-msg" style="display:none;">
+          <div class="empty-icon">✨</div>
+          <h3>No active mistakes yet</h3>
+          <p>Talk in Conversation mode. Any grammar or vocabulary slip will automatically turn into a personalized practice quiz here.</p>
+          <button type="button" class="btn-action-primary" onclick="switchView('voice')">Go to Conversation</button>
+        </div>
+
+        <div id="quiz-cards" class="quiz-cards-grid"></div>
+      </div>
+    </div>
+
+    <!-- ANALYSIS VIEW -->
+    <div id="view-analysis" class="view-panel" style="display: none;">
+      <div class="analysis-container">
+        <!-- Overview Banner -->
+        <div class="analysis-header-banner">
+          <div>
+            <h2 class="quiz-title">Cross-Session Analysis</h2>
+            <p class="quiz-subtitle">Long-term tracking of grammar accuracy, recurring patterns, and fluency trends.</p>
+          </div>
+          <button type="button" class="btn-refresh-quiz" onclick="loadAnalysis(true)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+
+        <!-- Metric KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Error-Free Turns</div>
+            <div class="kpi-value" id="kpi-accuracy">--%</div>
+            <div class="kpi-sub">Overall grammatical consistency</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Spoken Turns</div>
+            <div class="kpi-value" id="kpi-turns">0</div>
+            <div class="kpi-sub" id="kpi-sessions-sub">Across 0 sessions</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Active Corrections</div>
+            <div class="kpi-value" id="kpi-errors">0</div>
+            <div class="kpi-sub">Excluding dismissed slips</div>
+          </div>
+        </div>
+
+        <!-- AI Coach Written Diagnosis -->
+        <div class="analysis-card" id="ai-diagnosis-card">
+          <div class="analysis-card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>Coach Diagnosis & Recommendations</span>
+          </div>
+          <p class="ai-summary-text" id="ai-summary">Analyzing your speech history...</p>
+          <div class="focus-areas-list" id="ai-focus-areas"></div>
+        </div>
+
+        <!-- Topic Frequency Table -->
+        <div class="analysis-card">
+          <div class="analysis-card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Mistake Frequency by Grammar Topic</span>
+          </div>
+          <div class="table-wrap">
+            <table class="analysis-table">
+              <thead>
+                <tr>
+                  <th>Topic</th>
+                  <th>Errors</th>
+                  <th>Share</th>
+                  <th>Sessions</th>
+                  <th>Last Seen</th>
+                </tr>
+              </thead>
+              <tbody id="topic-freq-tbody">
+                <tr><td colspan="5" class="table-empty">No grammar mistakes recorded.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recurring Mistakes Breakdown -->
+        <div class="analysis-card" id="recurring-card">
+          <div class="analysis-card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            <span>Recurring Slips</span>
+          </div>
+          <div class="recurring-list" id="recurring-list">
+            <div class="table-empty">No recurring slips detected.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SETTINGS & SYSTEM PIPELINE VIEW -->
+    <div id="view-settings" class="view-panel" style="display: none;">
+      <div class="settings-container">
+        
+        <!-- Header Banner -->
+        <div class="settings-header-banner">
+          <div>
+            <h2 class="quiz-title">Settings & System Status</h2>
+            <p class="quiz-subtitle">Local hardware configuration, model parameters, and storage management.</p>
+          </div>
+          <div class="settings-header-actions">
+            <div class="settings-system-badge" id="settings-status-indicator">
+              <span class="status-dot connected"></span>
+              <span id="settings-pipeline-status">Status: Ready · RTX 5090</span>
+            </div>
+            <button type="button" class="btn-refresh-quiz" onclick="loadSettings(true)" title="Check Pipeline Status">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              <span>Check</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- System Architecture Overview / Pipeline Flow -->
+        <div class="settings-card">
+          <div class="settings-card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>Local Pipeline Infrastructure</span>
+          </div>
+          
+          <div class="pipeline-flow-grid">
+            <!-- STT -->
+            <div class="pipe-node-card">
+              <div class="pipe-node-top">
+                <div class="pipe-node-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                </div>
+                <span class="pipe-badge">CUDA · RTX 5090</span>
+              </div>
+              <div class="pipe-node-name">Speech-to-Text (STT)</div>
+              <div class="pipe-node-model" id="settings-stt-model">Faster-Whisper (Large-v3-Turbo)</div>
+              <p class="pipe-node-desc">CTranslate2 int8_float16. Preserves verbatim speech without auto-correcting grammar slips.</p>
+              <div class="pipe-node-spec" id="settings-stt-device">Device: CUDA (RTX 5090)</div>
+            </div>
+
+            <!-- LLM -->
+            <div class="pipe-node-card">
+              <div class="pipe-node-top">
+                <div class="pipe-node-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+                </div>
+                <span class="pipe-badge">SGLang · Port 30050</span>
+              </div>
+              <div class="pipe-node-name">Conversation Coach (LLM)</div>
+              <div class="pipe-node-model" id="settings-llm-model">qwen3.8-fast</div>
+              <p class="pipe-node-desc">Low-latency token generation via LiteLLM routing to local SGLang inference engine.</p>
+              <div class="pipe-node-spec" id="settings-llm-endpoint">Endpoint: http://localhost:4000/v1</div>
+            </div>
+
+            <!-- TTS -->
+            <div class="pipe-node-card">
+              <div class="pipe-node-top">
+                <div class="pipe-node-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                </div>
+                <span class="pipe-badge">Edge-TTS</span>
+              </div>
+              <div class="pipe-node-name">Speech Synthesis (TTS)</div>
+              <div class="pipe-node-model" id="settings-tts-model">Edge-TTS Neural Audio</div>
+              <p class="pipe-node-desc">Streaming audio synthesis with sentence-level preloading in MP3 format.</p>
+              <div class="pipe-node-spec" id="settings-tts-voice">Voice: en-US-AndrewNeural</div>
+            </div>
+
+            <!-- Database -->
+            <div class="pipe-node-card">
+              <div class="pipe-node-top">
+                <div class="pipe-node-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                </div>
+                <span class="pipe-badge">SQLite3</span>
+              </div>
+              <div class="pipe-node-name">Persistence & History</div>
+              <div class="pipe-node-model">SQLite3 (tutor.db)</div>
+              <p class="pipe-node-desc">Local database storage for conversation turns, recorded mistakes, and quiz logs.</p>
+              <div class="pipe-node-spec">Tables: sessions, turns, mistakes, quiz_attempts</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coach Configuration & Voice Tester Card -->
+        <div class="settings-card">
+          <div class="settings-card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span id="settings-lang-section-title">Language, Voice & Scenario Settings</span>
+          </div>
+
+          <div class="settings-form-grid">
+            <div class="settings-field">
+              <label for="settings-language-select" class="settings-label" id="lbl-settings-lang">Practice Language</label>
+              <select id="settings-language-select" class="settings-select" onchange="syncLanguageFromSettings(this.value)">
+                <option value="en">🇬🇧 English</option>
+                <option value="de">🇩🇪 Deutsch</option>
+                <option value="es">🇪🇸 Español</option>
+                <option value="fr">🇫🇷 Français</option>
+                <option value="it">🇮🇹 Italiano</option>
+              </select>
+            </div>
+
+            <div class="settings-field">
+              <label for="settings-voice-select" class="settings-label" id="lbl-settings-voice">Active Voice</label>
+              <select id="settings-voice-select" class="settings-select" onchange="syncVoiceFromSettings(this.value)">
+                <option value="en-US-AndrewNeural">Andrew (US · Natural & Warm)</option>
+                <option value="en-US-AvaNeural">Ava (US · Clear & Expressive)</option>
+                <option value="en-GB-RyanNeural">Ryan (UK · Articulate)</option>
+                <option value="en-GB-SoniaNeural">Sonia (UK · Bright)</option>
+              </select>
+            </div>
+
+            <div class="settings-field">
+              <label for="settings-scenario-select" class="settings-label" id="lbl-settings-scenario">Active Scenario</label>
+              <select id="settings-scenario-select" class="settings-select" onchange="syncScenarioFromSettings(this.value)">
+                <option value="casual">Casual Conversation</option>
+                <option value="interview">Job Interview Practice</option>
+                <option value="tech">Tech & Software Architecture</option>
+                <option value="travel">Travel & Daily Life</option>
+                <option value="grammar">Grammar Focus & Drills</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-actions-row">
+            <button type="button" class="btn-secondary-action" id="btn-test-voice" onclick="testCurrentVoice()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <span>Test Voice Output</span>
+            </button>
+            <span class="settings-tip-text">Synthesizes a short test sample via Edge-TTS and plays back locally.</span>
+          </div>
+        </div>
+
+        <!-- Data & Context Management -->
+        <div class="settings-card danger-card">
+          <div class="settings-card-title danger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Data Management</span>
+          </div>
+          
+          <div class="danger-card-body">
+            <div class="danger-info">
+              <div class="danger-heading">Clear Conversation History & Database</div>
+              <p class="danger-explanation">
+                Deletes all spoken turns, mistake logs, quiz records, and aggregated analytics from <code>tutor.db</code>.
+              </p>
+            </div>
+            <button type="button" class="btn-danger-reset" id="btn-reset-data" onclick="resetAllContextData()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span>Clear History</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script src="/static/app.js?v=14"></script>
+</body>
+</html>
