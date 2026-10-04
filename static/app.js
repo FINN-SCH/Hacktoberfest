@@ -1,10 +1,12 @@
-/* English Voice Language Coach - Frontend Application */
+/* English Voice Language Coach & Quiz Tutor - Frontend Application */
 
 // State
 let appState = "idle"; // "idle" | "listening" | "thinking" | "speaking"
 let isContinuousMode = false;
 let currentScenario = "casual";
 let currentVoice = "en-US-AndrewNeural";
+let currentSessionId = "session_" + Date.now();
+let lastMistakeId = null;
 
 let mediaRecorder = null;
 let audioChunks = [];
@@ -35,6 +37,8 @@ const userTranscript = document.getElementById("user-transcript");
 const feedbackBanner = document.getElementById("feedback-banner");
 const feedbackIcon = document.getElementById("feedback-icon");
 const feedbackText = document.getElementById("feedback-text");
+const feedbackTopicBadge = document.getElementById("feedback-topic-badge");
+const feedbackActions = document.getElementById("feedback-actions");
 const coachResponse = document.getElementById("coach-response");
 const canvasEl = document.getElementById("visualizer");
 const canvasCtx = canvasEl.getContext("2d");
@@ -43,6 +47,27 @@ const continuousLabel = document.getElementById("continuous-label");
 const textInput = document.getElementById("text-input");
 const scenarioSelect = document.getElementById("scenario-select");
 const voiceSelect = document.getElementById("voice-select");
+
+// Navigation View Tabs
+function switchView(viewName) {
+  const voiceTab = document.getElementById("tab-voice");
+  const quizTab = document.getElementById("tab-quiz");
+  const voiceView = document.getElementById("view-voice");
+  const quizView = document.getElementById("view-quiz");
+
+  if (viewName === "voice") {
+    voiceTab.classList.add("active");
+    quizTab.classList.remove("active");
+    voiceView.style.display = "block";
+    quizView.style.display = "none";
+  } else if (viewName === "quiz") {
+    quizTab.classList.add("active");
+    voiceTab.classList.remove("active");
+    voiceView.style.display = "none";
+    quizView.style.display = "block";
+    loadQuiz(false);
+  }
+}
 
 // Audio Tone Chimes
 function playChime(kind) {
@@ -74,6 +99,7 @@ function playChime(kind) {
 
 function setUIState(newState) {
   appState = newState;
+  if (!orbWrapper) return;
   orbWrapper.className = "orb-wrapper " + (newState === "idle" ? "" : newState);
   statusDot.className = "status-dot " + (newState === "idle" ? "" : newState);
 
@@ -278,7 +304,10 @@ async function executeCoachTurn(userInput) {
   coachResponse.textContent = "...";
   feedbackBanner.classList.add("empty");
   feedbackBanner.classList.remove("correct");
+  feedbackTopicBadge.textContent = "";
+  feedbackActions.style.display = "none";
   feedbackText.textContent = "";
+  lastMistakeId = null;
 
   conversationHistory.push({ role: "user", content: userInput });
 
@@ -289,7 +318,8 @@ async function executeCoachTurn(userInput) {
       body: JSON.stringify({
         messages: conversationHistory,
         topic: currentScenario,
-        voice: currentVoice
+        voice: currentVoice,
+        session_id: currentSessionId
       })
     });
 
@@ -315,16 +345,20 @@ async function executeCoachTurn(userInput) {
 
         try {
           const parsed = JSON.parse(jsonStr);
+          if (parsed.meta) {
+            if (parsed.meta.corrections && parsed.meta.corrections.length > 0) {
+              lastMistakeId = parsed.meta.corrections[0].id;
+              feedbackActions.style.display = "flex";
+            }
+          }
           if (parsed.delta) {
             rawOutput += parsed.delta;
             parseAndRenderCoachOutput(rawOutput);
 
-            // Stream spoken reply chunks into TTS queue (contains verbal correction + reply)
+            // Stream spoken reply chunks into TTS queue
             let spokenPart = "";
             if (rawOutput.includes("SPOKEN:")) {
               spokenPart = rawOutput.split("SPOKEN:")[1] || "";
-            } else if (rawOutput.includes("REPLY:")) {
-              spokenPart = rawOutput.split("REPLY:")[1] || "";
             }
 
             if (spokenPart) {
@@ -333,9 +367,8 @@ async function executeCoachTurn(userInput) {
               if (/[.!?]\s+$/.test(speechSentenceBuffer) || (speechSentenceBuffer.length > 70 && /[,;]\s+$/.test(speechSentenceBuffer))) {
                 const cleanChunk = speechSentenceBuffer
                   .replace(/CORRECTION:[\s\S]*?SPOKEN:/i, "")
-                  .replace(/FEEDBACK:[\s\S]*?REPLY:/i, "")
+                  .replace(/TOPIC:[\s\S]*?SPOKEN:/i, "")
                   .replace(/SPOKEN:/i, "")
-                  .replace(/REPLY:/i, "")
                   .trim();
                 speechSentenceBuffer = "";
                 if (cleanChunk) {
@@ -352,9 +385,8 @@ async function executeCoachTurn(userInput) {
     if (speechSentenceBuffer.trim()) {
       const cleanChunk = speechSentenceBuffer
         .replace(/CORRECTION:[\s\S]*?SPOKEN:/i, "")
-        .replace(/FEEDBACK:[\s\S]*?REPLY:/i, "")
+        .replace(/TOPIC:[\s\S]*?SPOKEN:/i, "")
         .replace(/SPOKEN:/i, "")
-        .replace(/REPLY:/i, "")
         .trim();
       if (cleanChunk) {
         queueTTS(cleanChunk);
@@ -378,21 +410,18 @@ async function executeCoachTurn(userInput) {
 
 function parseAndRenderCoachOutput(raw, isFinal = false) {
   let correction = "";
+  let topic = "";
   let spoken = "";
 
-  if (raw.includes("CORRECTION:") && raw.includes("SPOKEN:")) {
-    const parts = raw.split("SPOKEN:");
-    correction = parts[0].replace("CORRECTION:", "").trim();
-    spoken = parts[1].trim();
-  } else if (raw.includes("FEEDBACK:") && raw.includes("REPLY:")) {
-    const parts = raw.split("REPLY:");
-    correction = parts[0].replace("FEEDBACK:", "").trim();
-    spoken = parts[1].trim();
-  } else if (raw.includes("CORRECTION:")) {
-    correction = raw.replace("CORRECTION:", "").trim();
-  } else if (raw.includes("FEEDBACK:")) {
-    correction = raw.replace("FEEDBACK:", "").trim();
-  } else {
+  for (const line of raw.splitlines ? raw.splitlines() : raw.split("\n")) {
+    const l = line.trim();
+    if (l.startsWith("CORRECTION:")) correction = l.replace("CORRECTION:", "").trim();
+    else if (l.startsWith("TOPIC:")) topic = l.replace("TOPIC:", "").trim();
+  }
+
+  if (raw.includes("SPOKEN:")) {
+    spoken = raw.split("SPOKEN:")[1].trim();
+  } else if (!correction) {
     spoken = raw.trim();
   }
 
@@ -407,9 +436,16 @@ function parseAndRenderCoachOutput(raw, isFinal = false) {
     if (isFlawless) {
       feedbackBanner.classList.add("correct");
       feedbackIcon.textContent = "✅";
+      feedbackTopicBadge.textContent = "EXCELLENT";
+      feedbackActions.style.display = "none";
     } else {
       feedbackBanner.classList.remove("correct");
       feedbackIcon.textContent = "💡";
+      if (topic && topic !== "none") {
+        feedbackTopicBadge.textContent = topic.replace("en_", "").replace(/_/g, " ").toUpperCase();
+      } else {
+        feedbackTopicBadge.textContent = "GRAMMAR";
+      }
     }
   }
 
@@ -421,6 +457,144 @@ function parseAndRenderCoachOutput(raw, isFinal = false) {
   if (isFinal && spoken) {
     conversationHistory.push({ role: "assistant", content: spoken });
   }
+}
+
+// Mistake Exclusion / Dismissal ("Not a mistake" / "Misheard")
+async function dismissMistake(reason) {
+  if (!lastMistakeId) return;
+  try {
+    const res = await fetch(`/api/mistakes/${lastMistakeId}/exclude`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason })
+    });
+    if (res.ok) {
+      feedbackBanner.classList.add("correct");
+      feedbackIcon.textContent = "👌";
+      feedbackText.textContent = reason === "misheard" ? "Marked as misheard (removed from your quiz & stats)." : "Marked as not a mistake (dismissed).";
+      feedbackActions.style.display = "none";
+      feedbackTopicBadge.textContent = "EXCLUDED";
+    }
+  } catch (e) {
+    console.warn("Exclusion error:", e);
+  }
+}
+
+// Interactive Practice Quiz System
+let quizQuestions = [];
+
+async function loadQuiz(forceRefresh = false) {
+  const loadingEl = document.getElementById("quiz-loading");
+  const emptyEl = document.getElementById("quiz-empty");
+  const cardsEl = document.getElementById("quiz-cards");
+
+  if (!forceRefresh && quizQuestions.length > 0) {
+    renderQuizQuestions(quizQuestions);
+    return;
+  }
+
+  loadingEl.style.display = "block";
+  emptyEl.style.display = "none";
+  cardsEl.innerHTML = "";
+
+  try {
+    const res = await fetch(`/api/quiz/generate?session_id=${encodeURIComponent(currentSessionId)}`, {
+      method: "POST"
+    });
+    const data = await res.json();
+    loadingEl.style.display = "none";
+
+    quizQuestions = data.questions || [];
+    if (quizQuestions.length === 0) {
+      emptyEl.style.display = "block";
+    } else {
+      renderQuizQuestions(quizQuestions);
+    }
+  } catch (err) {
+    loadingEl.style.display = "none";
+    emptyEl.style.display = "block";
+    console.error("Quiz load error:", err);
+  }
+}
+
+function renderQuizQuestions(questions) {
+  const cardsEl = document.getElementById("quiz-cards");
+  cardsEl.innerHTML = "";
+
+  questions.forEach((q, qIdx) => {
+    const card = document.createElement("div");
+    card.className = "quiz-card";
+
+    let originHtml = "";
+    if (q.source_said) {
+      originHtml = `<div class="quiz-card-origin">Practising this because you said: <strong>"${escapeHtml(q.source_said)}"</strong></div>`;
+    }
+
+    const optionsHtml = (q.options || []).map((opt, oIdx) => `
+      <button type="button" class="quiz-option-btn" id="opt-${qIdx}-${oIdx}" onclick="answerQuizQuestion(${qIdx}, ${oIdx})">
+        ${escapeHtml(opt)}
+      </button>
+    `).join("");
+
+    card.innerHTML = `
+      ${originHtml}
+      <div class="quiz-card-q">${escapeHtml(q.question)}</div>
+      <div class="quiz-options" id="opts-${qIdx}">
+        ${optionsHtml}
+      </div>
+      <div class="quiz-explanation" id="exp-${qIdx}" style="display:none;"></div>
+    `;
+
+    cardsEl.appendChild(card);
+  });
+}
+
+async function answerQuizQuestion(qIdx, oIdx) {
+  const q = quizQuestions[qIdx];
+  if (!q) return;
+
+  const chosenOpt = q.options[oIdx];
+  const container = document.getElementById(`opts-${qIdx}`);
+  const buttons = container.querySelectorAll(".quiz-option-btn");
+  buttons.forEach(b => b.disabled = true);
+
+  try {
+    const res = await fetch("/api/quiz/grade", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mistake_id: q.mistake_id,
+        question_text: q.question,
+        user_answer: chosenOpt,
+        correct_answer: q.correct_answer
+      })
+    });
+    const result = await res.json();
+
+    const clickedBtn = document.getElementById(`opt-${qIdx}-${oIdx}`);
+    if (result.is_correct) {
+      clickedBtn.classList.add("correct");
+    } else {
+      clickedBtn.classList.add("wrong");
+      // Highlight correct button
+      buttons.forEach(b => {
+        if (b.textContent.trim().toLowerCase() === q.correct_answer.trim().toLowerCase()) {
+          b.classList.add("correct");
+        }
+      });
+    }
+
+    const expEl = document.getElementById(`exp-${qIdx}`);
+    expEl.style.display = "block";
+    expEl.innerHTML = `<strong>${result.is_correct ? '✅ Correct!' : '❌ Not quite.'}</strong> ${escapeHtml(q.explanation || '')}`;
+  } catch (e) {
+    console.error("Grade error:", e);
+  }
+}
+
+function escapeHtml(text) {
+  if (!text) return "";
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 // Queue TTS Audio chunks for consecutive seamless playback
@@ -538,5 +712,5 @@ window.addEventListener("keydown", (e) => {
 });
 
 window.addEventListener("DOMContentLoaded", () => {
-  console.log("English Voice Coach ready.");
+  console.log("English Voice Coach & Quiz Tutor ready.");
 });
