@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useMicVAD } from '@ricky0123/vad-react';
+import { MicVAD, type RealTimeVADOptions } from '@ricky0123/vad-web';
 import { measureTiming, type ClassifiedFrame, type SpeechTiming, SAMPLE_RATE, TIMING_VERSION } from './timing';
 import { encodeWav } from './wav';
 import { AudioPlayer } from './player';
@@ -20,6 +20,9 @@ const PRE_PAD_FRAMES = Math.floor(200 / 32); // pinned Silero v5: 512 samples at
 export function useConversationAudio({ onTurn }: Options) {
   const [state, setState] = useState<ConversationState>('STOPPED');
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [userSpeaking, setUserSpeaking] = useState(false);
+  const detector = useRef<MicVAD | null>(null);
   const stateRef = useRef<ConversationState>('STOPPED');
   const streamRef = useRef<MediaStream | null>(null);
   const frames = useRef<ClassifiedFrame[]>([]);
@@ -56,7 +59,7 @@ export function useConversationAudio({ onTurn }: Options) {
     return stream;
   }, []);
   const pauseRef = useRef<() => Promise<void>>(async () => {});
-  const vad = useMicVAD({
+  const vadOptions: Partial<RealTimeVADOptions> = {
     model: 'v5', startOnLoad: false, baseAssetPath: '/vad/', onnxWASMBasePath: '/vad/',
     positiveSpeechThreshold: POSITIVE_THRESHOLD, negativeSpeechThreshold: 0.35,
     preSpeechPadMs: 200, redemptionMs: 1200, minSpeechMs: 400,
@@ -66,6 +69,7 @@ export function useConversationAudio({ onTurn }: Options) {
     resumeStream: acquireStream,
     onFrameProcessed: (probabilities, frame) => {
       if (!micEnabled(stateRef.current)) return;
+      setUserSpeaking(probabilities.isSpeech > 0.6);
       const voiced = probabilities.isSpeech >= POSITIVE_THRESHOLD;
       frames.current.push({ voiced, samples: frame.length });
       if (voiced) collecting.current = true;
@@ -96,26 +100,42 @@ export function useConversationAudio({ onTurn }: Options) {
         }).catch(reason => { if (currentGeneration === generation.current) fail(reason); });
       } catch (reason) { clearFrames(); fail(reason); }
     },
-  });
-  pauseRef.current = vad.pause;
+  };
+  pauseRef.current = async () => { await detector.current?.pause(); };
 
   // Serialize starts/pauses: permission acquisition or model setup may complete after Stop.
   const gate = useRef(Promise.resolve());
   useEffect(() => {
-    if (vad.loading || vad.errored) return;
     gate.current = gate.current.then(async () => {
       if (micEnabled(stateRef.current)) {
         clearFrames();
-        await vad.start();
-        if (!micEnabled(stateRef.current)) await vad.pause();
+        if (!detector.current) {
+          // Permission is requested before constructing MicVAD: a denied request
+          // must not leave behind the library's permanently errored instance.
+          const stream = await acquireStream();
+          setLoading(true);
+          // Construct only when capture was requested, never in a mount effect.
+          // The pinned library cannot destroy an unstarted detector (StrictMode).
+          detector.current = await MicVAD.new({
+            ...vadOptions, startOnLoad: true, getStream: async () => stream,
+          });
+        } else {
+          await detector.current.start();
+        }
+        if (!micEnabled(stateRef.current)) await detector.current.pause();
       } else {
-        await vad.pause();
+        await detector.current?.pause();
+        setUserSpeaking(false);
         clearFrames();
       }
-    }).catch(reason => {
+    }).catch(async reason => {
+      const failed = detector.current;
+      detector.current = null;
+      streamRef.current?.getTracks().forEach(track => track.stop());
+      if (failed) await failed.destroy().catch(() => {});
       if (stateRef.current !== 'STOPPED') fail(reason);
-    });
-  }, [state, vad.loading, vad.errored, vad.start, vad.pause, clearFrames, fail]);
+    }).finally(() => { setLoading(false); });
+  }, [state, acquireStream, clearFrames, fail]);
 
   useEffect(() => {
     return () => {
@@ -123,12 +143,18 @@ export function useConversationAudio({ onTurn }: Options) {
       stateRef.current = 'STOPPED';
       streamRef.current?.getTracks().forEach(track => track.stop());
       void player.current.dispose();
+      // Wait for pending microphone/model setup before releasing its resources.
+      gate.current = gate.current.then(async () => {
+        const previous = detector.current;
+        detector.current = null;
+        await previous?.destroy();
+      }).catch(() => {});
     };
   }, []);
 
   const start = async ({ opening = false }: { opening?: boolean } = {}) => {
     if (stateRef.current !== 'STOPPED') return;
-    if (vad.loading || vad.errored) { setError(vad.errored || 'Speech detector is still loading'); return; }
+    if (loading) { setError('Speech detector is still loading'); return; }
     const currentGeneration = ++generation.current;
     try {
       // Must be called in the Start button handler to unlock playback.
@@ -168,7 +194,7 @@ export function useConversationAudio({ onTurn }: Options) {
       dispatch('RETRY');
     } catch (reason) { fail(reason); }
   };
-  return { state, error: error || vad.errored || null, loading: vad.loading,
-    userSpeaking: micEnabled(state) && vad.userSpeaking,
+  return { state, error, loading,
+    userSpeaking: micEnabled(state) && userSpeaking,
     start, stop, retry, playReply, fail, generation: generation.current };
 }
