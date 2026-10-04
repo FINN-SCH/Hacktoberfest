@@ -1,0 +1,4 @@
+.npm-cache/
+public/vad/*
+!public/vad/.gitkeep
+*.tsbuildinfo

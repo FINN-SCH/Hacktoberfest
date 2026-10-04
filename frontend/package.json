@@ -1,0 +1,34 @@
+{
+  "name": "voice-language-tutor",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.11.0"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "postinstall": "node scripts/copy-vad-assets.mjs",
+    "build": "node scripts/copy-vad-assets.mjs && tsc -b && vite build",
+    "test": "vitest run",
+    "types:generate": "node scripts/generate-types.mjs",
+    "types:check": "node scripts/generate-types.mjs --check"
+  },
+  "dependencies": {
+    "@ricky0123/vad-react": "0.0.37",
+    "@ricky0123/vad-web": "0.0.31",
+    "onnxruntime-web": "1.22.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.5",
+    "@vitejs/plugin-react": "4.7.0",
+    "openapi-typescript": "7.6.1",
+    "typescript": "5.7.3",
+    "vite": "6.4.3",
+    "vitest": "3.2.4"
+  }
+}
