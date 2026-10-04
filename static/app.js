@@ -9,6 +9,8 @@ const LANG_DATA = {
     voices: [
       { id: "en-US-AndrewNeural", name: "Andrew (US · Natural & Warm)" },
       { id: "en-US-AvaNeural", name: "Ava (US · Clear & Expressive)" },
+      { id: "en-US-BrianNeural", name: "Brian (US · Deep & Calm)" },
+      { id: "en-US-EmmaNeural", name: "Emma (US · Cheerful)" },
       { id: "en-GB-RyanNeural", name: "Ryan (UK · Articulate)" },
       { id: "en-GB-SoniaNeural", name: "Sonia (UK · Bright)" }
     ],
@@ -32,7 +34,10 @@ const LANG_DATA = {
     voices: [
       { id: "de-DE-ConradNeural", name: "Conrad (DE · Warm & Klar)" },
       { id: "de-DE-KatjaNeural", name: "Katja (DE · Natürlich & Freundlich)" },
-      { id: "de-DE-KillianNeural", name: "Killian (DE · Dynamisch)" }
+      { id: "de-DE-KillianNeural", name: "Killian (DE · Dynamisch)" },
+      { id: "de-DE-FlorianMultilingualNeural", name: "Florian (DE · Vielseitig)" },
+      { id: "de-DE-SeraphinaMultilingualNeural", name: "Seraphina (DE · Sanft)" },
+      { id: "de-DE-AmalaNeural", name: "Amala (DE · Ausdrucksstark)" }
     ],
     greeting: "Hallo Jonathan! Ich bin dein Deutsch-Konversations-Coach. Worüber möchtest du heute sprechen?",
     starters: [
@@ -53,7 +58,8 @@ const LANG_DATA = {
     defaultVoice: "es-ES-AlvaroNeural",
     voices: [
       { id: "es-ES-AlvaroNeural", name: "Álvaro (ES · Natural)" },
-      { id: "es-ES-ElviraNeural", name: "Elvira (ES · Clara y Expresiva)" }
+      { id: "es-ES-ElviraNeural", name: "Elvira (ES · Clara y Expresiva)" },
+      { id: "es-ES-XimenaNeural", name: "Ximena (ES · Amable)" }
     ],
     greeting: "¡Hola Jonathan! Soy tu tutor de conversación en español. ¿De qué te gustaría hablar hoy?",
     starters: [
@@ -74,7 +80,10 @@ const LANG_DATA = {
     defaultVoice: "fr-FR-HenriNeural",
     voices: [
       { id: "fr-FR-HenriNeural", name: "Henri (FR · Chaleureux)" },
-      { id: "fr-FR-DeniseNeural", name: "Denise (FR · Articulée)" }
+      { id: "fr-FR-DeniseNeural", name: "Denise (FR · Articulée)" },
+      { id: "fr-FR-EloiseNeural", name: "Eloise (FR · Naturelle)" },
+      { id: "fr-FR-RemyMultilingualNeural", name: "Remy (FR · Polyvalent)" },
+      { id: "fr-FR-VivienneMultilingualNeural", name: "Vivienne (FR · Douce)" }
     ],
     greeting: "Bonjour Jonathan ! Je suis ton coach de conversation en français. De quoi aimerais-tu parler aujourd'hui ?",
     starters: [
@@ -95,7 +104,9 @@ const LANG_DATA = {
     defaultVoice: "it-IT-DiegoNeural",
     voices: [
       { id: "it-IT-DiegoNeural", name: "Diego (IT · Naturale)" },
-      { id: "it-IT-ElsaNeural", name: "Elsa (IT · Espressiva)" }
+      { id: "it-IT-ElsaNeural", name: "Elsa (IT · Espressiva)" },
+      { id: "it-IT-IsabellaNeural", name: "Isabella (IT · Vivace)" },
+      { id: "it-IT-GiuseppeMultilingualNeural", name: "Giuseppe (IT · Caldo)" }
     ],
     greeting: "Ciao Jonathan! Sono il tuo tutor di conversazione in italiano. Di cosa vorresti parlare oggi?",
     starters: [
@@ -407,7 +418,7 @@ let isSessionStarted = false;
 let currentLanguage = localStorage.getItem("jarvis_coach_lang") || "en";
 let uiLanguage = localStorage.getItem("jarvis_ui_lang") || "en";
 let currentScenario = "casual";
-let currentVoice = LANG_DATA[currentLanguage]?.defaultVoice || "en-US-AndrewNeural";
+let currentVoice = localStorage.getItem(`jarvis_voice_${currentLanguage}`) || LANG_DATA[currentLanguage]?.defaultVoice || "en-US-AndrewNeural";
 let currentSessionId = "session_" + Date.now();
 let lastMistakeId = null;
 
@@ -937,7 +948,7 @@ function updateQuizBadge(delta) {
 // Low-latency Audio Queue with Preloading
 function queueTTS(sentence) {
   if (!sentence) return;
-  const audioUrl = `/api/tts?text=${encodeURIComponent(sentence)}&voice=${encodeURIComponent(currentVoice)}`;
+  const audioUrl = `/api/tts?text=${encodeURIComponent(sentence)}&voice=${encodeURIComponent(currentVoice)}&lang=${encodeURIComponent(currentLanguage)}`;
   
   // Preload audio element right away so fetch happens concurrently
   const audioEl = new Audio();
@@ -1270,8 +1281,35 @@ function changeScenario(val) {
   coachResponse.textContent = `Scenario ready. Click the microphone to start our ${val} practice.`;
 }
 
+// Returns the remembered speaker for a language, or its default if none/invalid
+function resolveVoiceForLanguage(lang) {
+  const info = LANG_DATA[lang] || LANG_DATA.en;
+  const saved = localStorage.getItem(`jarvis_voice_${lang}`);
+  if (saved && info.voices.some(v => v.id === saved)) return saved;
+  return info.defaultVoice;
+}
+
+function stopAllAudio() {
+  audioQueue.forEach(item => { try { item.audio && item.audio.pause(); } catch (e) {} });
+  audioQueue = [];
+  if (currentPlayingAudio) {
+    try { currentPlayingAudio.pause(); } catch (e) {}
+    currentPlayingAudio = null;
+  }
+  isAudioPlaying = false;
+  if (typeof testVoiceAudio !== "undefined" && testVoiceAudio) {
+    try { testVoiceAudio.pause(); } catch (e) {}
+  }
+}
+
 function changeVoice(val) {
+  const info = LANG_DATA[currentLanguage] || LANG_DATA.en;
+  if (!info.voices.some(v => v.id === val)) val = info.defaultVoice;
   currentVoice = val;
+  localStorage.setItem(`jarvis_voice_${currentLanguage}`, val);
+  if (voiceSelect && voiceSelect.value !== val) {
+    voiceSelect.value = val;
+  }
   const settingsVoiceSelect = document.getElementById("settings-voice-select");
   if (settingsVoiceSelect && settingsVoiceSelect.value !== val) {
     settingsVoiceSelect.value = val;
@@ -1301,8 +1339,11 @@ function changeLanguage(val, startFresh = true) {
   // Unified language switch: synchronize entire UI interface language with practice language
   applyUILanguage(val);
 
+  // Stop any audio still playing/queued in the previous language's voice
+  stopAllAudio();
+
   const info = LANG_DATA[val];
-  currentVoice = info.defaultVoice;
+  currentVoice = resolveVoiceForLanguage(val);
   updateVoiceDropdowns(val);
   renderStarters(val);
 

@@ -58,25 +58,36 @@ VOICES_BY_LANG = {
     "en": [
         {"id": "en-US-AndrewNeural", "name": "Andrew (US · Natural & Warm)", "gender": "male", "locale": "en-US"},
         {"id": "en-US-AvaNeural", "name": "Ava (US · Clear & Expressive)", "gender": "female", "locale": "en-US"},
+        {"id": "en-US-BrianNeural", "name": "Brian (US · Deep & Calm)", "gender": "male", "locale": "en-US"},
+        {"id": "en-US-EmmaNeural", "name": "Emma (US · Cheerful)", "gender": "female", "locale": "en-US"},
         {"id": "en-GB-RyanNeural", "name": "Ryan (UK · Articulate)", "gender": "male", "locale": "en-GB"},
         {"id": "en-GB-SoniaNeural", "name": "Sonia (UK · Bright)", "gender": "female", "locale": "en-GB"}
     ],
     "de": [
         {"id": "de-DE-ConradNeural", "name": "Conrad (DE · Warm & Klar)", "gender": "male", "locale": "de-DE"},
         {"id": "de-DE-KatjaNeural", "name": "Katja (DE · Natürlich & Freundlich)", "gender": "female", "locale": "de-DE"},
-        {"id": "de-DE-KillianNeural", "name": "Killian (DE · Dynamisch)", "gender": "male", "locale": "de-DE"}
+        {"id": "de-DE-KillianNeural", "name": "Killian (DE · Dynamisch)", "gender": "male", "locale": "de-DE"},
+        {"id": "de-DE-FlorianMultilingualNeural", "name": "Florian (DE · Vielseitig)", "gender": "male", "locale": "de-DE"},
+        {"id": "de-DE-SeraphinaMultilingualNeural", "name": "Seraphina (DE · Sanft)", "gender": "female", "locale": "de-DE"},
+        {"id": "de-DE-AmalaNeural", "name": "Amala (DE · Ausdrucksstark)", "gender": "female", "locale": "de-DE"}
     ],
     "es": [
         {"id": "es-ES-AlvaroNeural", "name": "Álvaro (ES · Natural)", "gender": "male", "locale": "es-ES"},
-        {"id": "es-ES-ElviraNeural", "name": "Elvira (ES · Clara y Expresiva)", "gender": "female", "locale": "es-ES"}
+        {"id": "es-ES-ElviraNeural", "name": "Elvira (ES · Clara y Expresiva)", "gender": "female", "locale": "es-ES"},
+        {"id": "es-ES-XimenaNeural", "name": "Ximena (ES · Amable)", "gender": "female", "locale": "es-ES"}
     ],
     "fr": [
         {"id": "fr-FR-HenriNeural", "name": "Henri (FR · Chaleureux)", "gender": "male", "locale": "fr-FR"},
-        {"id": "fr-FR-DeniseNeural", "name": "Denise (FR · Articulée)", "gender": "female", "locale": "fr-FR"}
+        {"id": "fr-FR-DeniseNeural", "name": "Denise (FR · Articulée)", "gender": "female", "locale": "fr-FR"},
+        {"id": "fr-FR-EloiseNeural", "name": "Eloise (FR · Naturelle)", "gender": "female", "locale": "fr-FR"},
+        {"id": "fr-FR-RemyMultilingualNeural", "name": "Remy (FR · Polyvalent)", "gender": "male", "locale": "fr-FR"},
+        {"id": "fr-FR-VivienneMultilingualNeural", "name": "Vivienne (FR · Douce)", "gender": "female", "locale": "fr-FR"}
     ],
     "it": [
         {"id": "it-IT-DiegoNeural", "name": "Diego (IT · Naturale)", "gender": "male", "locale": "it-IT"},
-        {"id": "it-IT-ElsaNeural", "name": "Elsa (IT · Espressiva)", "gender": "female", "locale": "it-IT"}
+        {"id": "it-IT-ElsaNeural", "name": "Elsa (IT · Espressiva)", "gender": "female", "locale": "it-IT"},
+        {"id": "it-IT-IsabellaNeural", "name": "Isabella (IT · Vivace)", "gender": "female", "locale": "it-IT"},
+        {"id": "it-IT-GiuseppeMultilingualNeural", "name": "Giuseppe (IT · Caldo)", "gender": "male", "locale": "it-IT"}
     ]
 }
 
@@ -675,12 +686,18 @@ async def get_analysis_endpoint(session_id: Optional[str] = None):
     return data
 
 @app.get("/api/tts")
-async def tts_endpoint(text: str, voice: Optional[str] = None):
+async def tts_endpoint(text: str, voice: Optional[str] = None, lang: Optional[str] = None):
     clean = clean_speech_text(text)
     if not clean:
         raise HTTPException(status_code=400, detail="Text required")
 
-    active_voice = voice or DEFAULT_VOICE
+    active_voice = None
+    if voice and voice not in ("undefined", "null", ""):
+        active_voice = voice
+    elif lang and lang in SUPPORTED_LANGUAGES:
+        active_voice = SUPPORTED_LANGUAGES[lang]["default_voice"]
+    else:
+        active_voice = DEFAULT_VOICE
     cache_key = f"{active_voice}:{clean}"
     if cache_key in tts_cache:
         return Response(content=tts_cache[cache_key], media_type="audio/mpeg")
