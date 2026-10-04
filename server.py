@@ -7,6 +7,7 @@ import ctypes
 import asyncio
 import json
 import uuid
+import time
 from typing import Optional, List, Dict, Any
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, StreamingResponse, Response, JSONResponse
@@ -134,6 +135,20 @@ class QuizGradeRequest(BaseModel):
     user_answer: str
     correct_answer: str
 
+class StartSessionRequest(BaseModel):
+    session_id: Optional[str] = None
+    scenario: Optional[str] = "casual"
+    level: Optional[str] = "B1"
+    voice: Optional[str] = DEFAULT_VOICE
+
+SCENARIO_GREETINGS = {
+    "casual": "Hello Jonathan! Great to talk with you today. What's on your mind or how has your week been?",
+    "interview": "Good morning Jonathan, welcome to your practice interview! To get us started, could you briefly introduce yourself and your background?",
+    "tech": "Hey Jonathan! Ready for some tech discussion. What interesting software, framework, or coding project have you been working on recently?",
+    "travel": "Hello Jonathan! Let's talk about travel. If you could fly anywhere in the world tomorrow, where would you go and why?",
+    "grammar": "Welcome to your grammar drill Jonathan! Let's speak in full sentences. Can you tell me what you did yesterday from morning to evening?"
+}
+
 @app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def serve_index():
     index_file = os.path.join(os.path.dirname(__file__), "static", "index.html")
@@ -149,6 +164,28 @@ async def health():
         "service": "Voice Language Tutor & Coach",
         "voice": DEFAULT_VOICE,
         "model": MODEL_NAME
+    }
+
+@app.post("/api/sessions/start")
+async def start_session_endpoint(req: StartSessionRequest):
+    sid = req.session_id or f"session_{int(time.time()*1000)}"
+    scenario = req.scenario or "casual"
+    database.create_session(sid, target_lang="en", native_lang="de", level=req.level or "B1", scenario=scenario)
+    
+    greeting = SCENARIO_GREETINGS.get(scenario, SCENARIO_GREETINGS["casual"])
+    turn_id = f"turn_{uuid.uuid4().hex[:10]}"
+    database.record_turn(
+        turn_id=turn_id,
+        session_id=sid,
+        user_transcript="[Session Started - Coach Opening]",
+        assistant_reply=greeting,
+        assistant_spoken=greeting,
+        corrections=[]
+    )
+    return {
+        "session_id": sid,
+        "greeting": greeting,
+        "turn_id": turn_id
     }
 
 @app.post("/api/stt")

@@ -3,6 +3,7 @@
 // State
 let appState = "idle"; // "idle" | "listening" | "thinking" | "speaking"
 let isContinuousMode = false;
+let isSessionStarted = false;
 let currentScenario = "casual";
 let currentVoice = "en-US-AndrewNeural";
 let currentSessionId = "session_" + Date.now();
@@ -108,8 +109,13 @@ function setUIState(newState) {
   statusDot.className = "status-dot " + (newState === "idle" ? "" : newState);
 
   if (newState === "idle") {
-    orbLabel.textContent = isContinuousMode ? "LISTENING..." : "TAP TO SPEAK";
-    statusText.textContent = isContinuousMode ? "HANDS-FREE ON" : "READY";
+    if (!isSessionStarted) {
+      orbLabel.textContent = "START CHAT";
+      statusText.textContent = "READY TO START";
+    } else {
+      orbLabel.textContent = isContinuousMode ? "LISTENING..." : "TAP TO SPEAK";
+      statusText.textContent = isContinuousMode ? "HANDS-FREE ON" : "READY";
+    }
   } else if (newState === "listening") {
     orbLabel.textContent = "LISTENING...";
     statusText.textContent = "LISTENING";
@@ -117,8 +123,8 @@ function setUIState(newState) {
     orbLabel.textContent = "THINKING...";
     statusText.textContent = "COACH THINKING";
   } else if (newState === "speaking") {
-    orbLabel.textContent = "SPEAKING...";
-    statusText.textContent = "SPEAKING";
+    orbLabel.textContent = "COACH TALKING";
+    statusText.textContent = "COACH SPEAKING";
   }
 }
 
@@ -677,6 +683,40 @@ function escapeHtml(text) {
 }
 
 // User Actions
+async function startConversationFlow() {
+  await ensureAudioContext();
+  isSessionStarted = true;
+  setUIState("thinking");
+  coachResponse.textContent = "Connecting to coach...";
+  userTranscript.textContent = "Coach is starting our conversation...";
+  userTranscript.classList.remove("empty");
+
+  try {
+    const res = await fetch("/api/sessions/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        session_id: currentSessionId,
+        scenario: currentScenario,
+        voice: currentVoice
+      })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    
+    coachResponse.textContent = data.greeting;
+    conversationHistory = [{ role: "assistant", content: data.greeting }];
+    
+    // Automatically speak the greeting aloud!
+    queueTTS(data.greeting);
+  } catch (err) {
+    console.error("Start error:", err);
+    coachResponse.textContent = "Hello Jonathan! How are you doing today?";
+    conversationHistory = [{ role: "assistant", content: coachResponse.textContent }];
+    queueTTS(coachResponse.textContent);
+  }
+}
+
 function handleOrbClick() {
   if (appState === "speaking" && currentPlayingAudio) {
     currentPlayingAudio.pause();
@@ -688,7 +728,13 @@ function handleOrbClick() {
   }
 
   if (appState === "idle") {
-    startRecording();
+    if (!isSessionStarted) {
+      // First click: Coach takes the floor and initiates the conversation
+      startConversationFlow();
+    } else {
+      // Subsequent clicks: User speaks their turn
+      startRecording();
+    }
   } else if (appState === "listening") {
     stopRecordingAndSubmit();
   }
@@ -700,13 +746,26 @@ function toggleContinuousMode() {
   continuousLabel.textContent = isContinuousMode ? "Hands-Free: ON" : "Hands-Free: OFF";
 
   if (isContinuousMode && appState === "idle") {
-    startRecording();
+    if (!isSessionStarted) {
+      startConversationFlow();
+    } else {
+      startRecording();
+    }
   }
 }
 
 function changeScenario(val) {
   currentScenario = val;
   console.log("Scenario changed to:", val);
+  
+  // Starting a new scenario resets the session so the coach opens with the new scenario prompt
+  currentSessionId = "session_" + Date.now();
+  isSessionStarted = false;
+  conversationHistory = [];
+  setUIState("idle");
+  userTranscript.textContent = `Scenario set to ${val}. Tap the orb to have the coach begin!`;
+  userTranscript.classList.remove("empty");
+  coachResponse.textContent = "Tap the orb to start our " + val + " conversation.";
 }
 
 function changeVoice(val) {
