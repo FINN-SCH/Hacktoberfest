@@ -140,11 +140,22 @@ async def test_invalid_llm_output_gets_one_repair(db):
     assert "rejected" in prov.llm.seen[1][-1]["content"]
 
 
-async def test_rejected_generation_is_retried_once(db):
+@pytest.mark.parametrize("code", ["invalid_response", "truncated"])
+async def test_rejected_generation_is_retried_once(db, code):
     sid = (await new_session(db)).session.id
-    prov = Providers(llm=FakeLLM(outputs=[ProviderError("invalid_response", "llm", retryable=True), json.dumps(GOOD)]))
+    prov = Providers(llm=FakeLLM(outputs=[ProviderError(code, "llm", retryable=True), json.dumps(GOOD)]))
     out = await submit(db, prov, sid)
     assert out.correction_status == "done" and prov.llm.calls == 2
+
+
+async def test_truncated_generation_stops_after_one_retry(db):
+    sid = (await new_session(db)).session.id
+    prov = Providers(llm=FakeLLM(outputs=[ProviderError("truncated", "llm", retryable=True)] * 2))
+    with pytest.raises(ApiError) as exc:
+        await submit(db, prov, sid)
+    assert exc.value.body.code == "truncated"
+    assert prov.llm.calls == 2
+    assert turns.get_turn_by_client(db, sid, "t1").correction_status == "analysis_failed"
 
 
 async def test_analysis_failure_keeps_transcript_and_retries_without_audio(db):

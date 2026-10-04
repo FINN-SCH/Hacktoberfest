@@ -257,7 +257,7 @@ async def _run_analysis(db: DBSession, providers, settings, s: Session, t: Turn)
             try:
                 result = await providers.llm.complete(messages, schema=schema, purpose="turn")
             except ProviderError as e:
-                if attempt == 0 and e.code == "invalid_response":
+                if attempt == 0 and e.code in {"invalid_response", "truncated"}:
                     continue
                 raise
             model_name = result.model
