@@ -46,46 +46,115 @@ LITELLM_URL = os.getenv("LITELLM_URL", "http://localhost:4000/v1")
 MODEL_NAME = os.getenv("COACH_MODEL", "qwen3.8-fast")
 DEFAULT_VOICE = os.getenv("COACH_VOICE", "en-US-AndrewNeural")
 
-SYSTEM_PROMPT = """You are an active, supportive, and friendly English Language Tutor and Conversation Coach.
-Your primary mission is to actively correct Jonathan's English speech so he learns and improves on every turn, while maintaining a natural, engaging conversation.
+SUPPORTED_LANGUAGES = {
+    "en": {"name": "English", "native_name": "English", "flag": "🇬🇧", "default_voice": "en-US-AndrewNeural"},
+    "de": {"name": "German", "native_name": "Deutsch", "flag": "🇩🇪", "default_voice": "de-DE-ConradNeural"},
+    "es": {"name": "Spanish", "native_name": "Español", "flag": "🇪🇸", "default_voice": "es-ES-AlvaroNeural"},
+    "fr": {"name": "French", "native_name": "Français", "flag": "🇫🇷", "default_voice": "fr-FR-HenriNeural"},
+    "it": {"name": "Italian", "native_name": "Italiano", "flag": "🇮🇹", "default_voice": "it-IT-DiegoNeural"}
+}
 
-GRAMMAR TAXONOMY & TOPIC KEYS:
-Available English topic keys:
-- en_subject_verb_agreement (Subject-Verb Agreement, e.g. "my name are" -> "my name is", "he have" -> "he has")
-- en_past_simple_irregular (Irregular Past Forms, e.g. "I buyed" -> "I bought", "I go yesterday" -> "I went")
-- en_present_perfect_vs_past (Present Perfect vs. Past Simple)
-- en_third_person_s (3rd Person -s, e.g. "he run" -> "he runs")
-- en_continuous_vs_simple (Continuous vs. Simple Tense)
-- en_future_forms (will / going to)
-- en_question_formation (Questions & Auxiliaries, e.g. "Why you said that?" -> "Why did you say that?")
-- en_articles (a / an / the, e.g. "an university" -> "a university")
-- en_prepositions (Preposition Choice, e.g. "depend of" -> "depend on")
-- en_comparatives (Comparatives & Superlatives, e.g. "more better" -> "better")
-- en_countable_uncountable (Countable vs. Uncountable, e.g. "informations" -> "information")
-- en_pronouns (Pronouns)
-- en_vocabulary_choice (Denglish/German words like 'mein' or wrong word choice)
-- en_other (General grammar)
+VOICES_BY_LANG = {
+    "en": [
+        {"id": "en-US-AndrewNeural", "name": "Andrew (US · Natural & Warm)", "gender": "male", "locale": "en-US"},
+        {"id": "en-US-AvaNeural", "name": "Ava (US · Clear & Expressive)", "gender": "female", "locale": "en-US"},
+        {"id": "en-GB-RyanNeural", "name": "Ryan (UK · Articulate)", "gender": "male", "locale": "en-GB"},
+        {"id": "en-GB-SoniaNeural", "name": "Sonia (UK · Bright)", "gender": "female", "locale": "en-GB"}
+    ],
+    "de": [
+        {"id": "de-DE-ConradNeural", "name": "Conrad (DE · Warm & Klar)", "gender": "male", "locale": "de-DE"},
+        {"id": "de-DE-KatjaNeural", "name": "Katja (DE · Natürlich & Freundlich)", "gender": "female", "locale": "de-DE"},
+        {"id": "de-DE-KillianNeural", "name": "Killian (DE · Dynamisch)", "gender": "male", "locale": "de-DE"}
+    ],
+    "es": [
+        {"id": "es-ES-AlvaroNeural", "name": "Álvaro (ES · Natural)", "gender": "male", "locale": "es-ES"},
+        {"id": "es-ES-ElviraNeural", "name": "Elvira (ES · Clara y Expresiva)", "gender": "female", "locale": "es-ES"}
+    ],
+    "fr": [
+        {"id": "fr-FR-HenriNeural", "name": "Henri (FR · Chaleureux)", "gender": "male", "locale": "fr-FR"},
+        {"id": "fr-FR-DeniseNeural", "name": "Denise (FR · Articulée)", "gender": "female", "locale": "fr-FR"}
+    ],
+    "it": [
+        {"id": "it-IT-DiegoNeural", "name": "Diego (IT · Naturale)", "gender": "male", "locale": "it-IT"},
+        {"id": "it-IT-ElsaNeural", "name": "Elsa (IT · Espressiva)", "gender": "female", "locale": "it-IT"}
+    ]
+}
+
+SCENARIOS_BY_LANG = {
+    "en": {
+        "casual": "Hello Jonathan! Great to talk with you today. What's on your mind or how has your week been?",
+        "interview": "Good morning Jonathan, welcome to your practice interview! To get us started, could you briefly introduce yourself and your background?",
+        "tech": "Hey Jonathan! Ready for some tech discussion. What interesting software, framework, or coding project have you been working on recently?",
+        "travel": "Hello Jonathan! Let's talk about travel. If you could fly anywhere in the world tomorrow, where would you go and why?",
+        "grammar": "Welcome to your grammar drill Jonathan! Let's speak in full sentences. Can you tell me what you did yesterday from morning to evening?"
+    },
+    "de": {
+        "casual": "Hallo Jonathan! Schön, heute mit dir zu sprechen. Woran denkst du gerade oder wie war deine Woche bisher?",
+        "interview": "Guten Morgen Jonathan, willkommen zu deinem Vorstellungsgespräch! Könntest du dich zu Beginn kurz vorstellen und von deinem Werdegang erzählen?",
+        "tech": "Hallo Jonathan! Bereit für etwas Tech-Talk. An welchem spannenden Projekt, Framework oder Code hast du in letzter Zeit gearbeitet?",
+        "travel": "Hallo Jonathan! Lass uns über das Reisen sprechen. Wenn du morgen überallhin fliegen könntest, wohin würdest du reisen und warum?",
+        "grammar": "Willkommen zum Grammatik-Training, Jonathan! Lass uns in vollständigen Sätzen sprechen. Was hast du gestern von morgens bis abends gemacht?"
+    },
+    "es": {
+        "casual": "¡Hola Jonathan! Qué alegría hablar contigo hoy. ¿De qué te gustaría hablar o cómo ha ido tu semana?",
+        "interview": "¡Buenos días, Jonathan! Bienvenido a tu simulación de entrevista. Para comenzar, ¿podrías presentarte brevemente?",
+        "tech": "¡Hola Jonathan! Listos para hablar de tecnología. ¿En qué proyecto o código interesante has estado trabajando?",
+        "travel": "¡Hola Jonathan! Hablemos de viajes. Si pudieras viajar a cualquier lugar del mundo mañana, ¿a dónde irías?",
+        "grammar": "¡Bienvenido a tu práctica de gramática, Jonathan! Hablemos con frases completas. ¿Qué hiciste ayer a lo largo del día?"
+    },
+    "fr": {
+        "casual": "Bonjour Jonathan ! Ravi de discuter avec toi aujourd'hui. De quoi aimerais-tu parler ou comment s'est passée ta semaine ?",
+        "interview": "Bonjour Jonathan, bienvenue à ta simulation d'entretien ! Pour commencer, pourrais-tu te présenter brièvement ?",
+        "tech": "Salut Jonathan ! Prêt pour une discussion technique. Sur quel projet ou framework intéressant as-tu travaillé récemment ?",
+        "travel": "Bonjour Jonathan ! Parlons de voyages. Si tu pouvais partir n'importe où dans le monde demain, où irais-tu et pourquoi ?",
+        "grammar": "Bienvenue pour cette session de grammaire, Jonathan ! Faisons des phrases complètes. Raconte-moi ce que tu as fait hier ?"
+    },
+    "it": {
+        "casual": "Ciao Jonathan! Che bello parlare con te oggi. A cosa stai pensando o come è andata la tua settimana?",
+        "interview": "Buongiorno Jonathan, benvenuto al colloquio di prova! Per iniziare, potresti presentarti brevemente?",
+        "tech": "Ciao Jonathan! Pronto per parlare di tecnologia. A quale progetto, framework o codice interessante hai lavorato di recente?",
+        "travel": "Ciao Jonathan! Parliamo di viaggi. Se potessi volare ovunque nel mondo domani, dove andresti e perché?",
+        "grammar": "Benvenuto alla sessione di grammatica, Jonathan! Parliamo con frasi complete. Cosa hai fatto ieri dalla mattina alla sera?"
+    }
+}
+
+def get_system_prompt(target_lang: str = "en", native_lang: str = "de") -> str:
+    lang_info = SUPPORTED_LANGUAGES.get(target_lang, SUPPORTED_LANGUAGES["en"])
+    lang_name = lang_info["name"]
+    
+    # Get grammar taxonomy for this language
+    taxonomy_dict = TOPICS.get(target_lang, TOPICS["en"])
+    taxonomy_lines = "\n".join([f"- {k} ({v})" for k, v in taxonomy_dict.items()])
+    sample_topic = next(iter(taxonomy_dict.keys()))
+
+    return f"""You are an active, supportive, and friendly {lang_name} Language Tutor and Conversation Coach.
+Your primary mission is to actively correct Jonathan's {lang_name} speech so he learns and improves on every turn, while maintaining a natural, engaging conversation strictly in {lang_name}.
+
+GRAMMAR TAXONOMY & TOPIC KEYS FOR {lang_name.upper()}:
+Available topic keys:
+{taxonomy_lines}
+- {target_lang}_other (General grammar / word choice)
 
 RULES FOR YOUR RESPONSE:
 1. CHECK FOR MISTAKES:
-   Carefully check the user's input for any grammar mistakes, incorrect verb forms, wrong prepositions, German/Denglish words (like 'mein', 'ich', 'auch'), or unnatural phrasing.
+   Carefully check the user's input for any grammar mistakes, incorrect verb forms, wrong prepositions, slipped words from other languages, or unnatural phrasing in {lang_name}.
 
 2. IF THERE IS A MISTAKE:
    You MUST verbally correct it right away at the very start of your spoken response in a friendly, constructive way.
-   Explain the correct phrasing (e.g. "Quick correction: say 'My name is Jonathan' instead of 'are', since 'name' is singular.").
+   Explain the correct phrasing clearly (e.g. "Quick correction: ...").
    Then continue the conversation with an engaging comment and a follow-up question.
-   Specify the exact taxonomy TOPIC key (e.g. en_subject_verb_agreement).
+   Specify the exact taxonomy TOPIC key (e.g. {sample_topic}).
 
-3. IF THE ENGLISH WAS FLAWLESS:
+3. IF THE {lang_name.upper()} WAS FLAWLESS:
    Give brief verbal encouragement (e.g. "Spot on phrasing!"), then reply naturally with a follow-up question. Set TOPIC: none.
 
 4. FORMAT:
    Always format your answer strictly in these 4 lines:
-   CORRECTION: <Brief summary: Say '...' instead of '...' - explanation. Or 'None - great English!'>
-   TOPIC: <The matching topic key from the list above, e.g. en_subject_verb_agreement, or 'none'>
+   CORRECTION: <Brief summary: Say '...' instead of '...' - explanation. Or 'None - great {lang_name}!'>
+   TOPIC: <The matching topic key from the list above, e.g. {sample_topic}, or 'none'>
    ORIGINAL: <The exact wrong snippet the user said, or 'none'>
    CORRECTED: <The corrected replacement snippet, or 'none'>
-   SPOKEN: <Your full spoken response to Jonathan. MUST include the verbal correction first if there was a mistake, followed by your conversational reply. 2-3 sentences total, no markdown or emojis so it speaks cleanly via audio.>"""
+   SPOKEN: <Your full spoken response to Jonathan in {lang_name}. MUST include the verbal correction first if there was a mistake, followed by your conversational reply. 2-3 sentences total, no markdown or emojis so it speaks cleanly via audio.>"""
 
 # Faster-Whisper Model
 _whisper_model = None
@@ -125,6 +194,8 @@ class ChatRequest(BaseModel):
     topic: Optional[str] = "casual"
     voice: Optional[str] = DEFAULT_VOICE
     session_id: Optional[str] = "default_session"
+    target_lang: Optional[str] = "en"
+    native_lang: Optional[str] = "de"
 
 class ExcludeMistakeRequest(BaseModel):
     reason: Optional[str] = "not_a_mistake"
@@ -140,14 +211,8 @@ class StartSessionRequest(BaseModel):
     scenario: Optional[str] = "casual"
     level: Optional[str] = "B1"
     voice: Optional[str] = DEFAULT_VOICE
-
-SCENARIO_GREETINGS = {
-    "casual": "Hello Jonathan! Great to talk with you today. What's on your mind or how has your week been?",
-    "interview": "Good morning Jonathan, welcome to your practice interview! To get us started, could you briefly introduce yourself and your background?",
-    "tech": "Hey Jonathan! Ready for some tech discussion. What interesting software, framework, or coding project have you been working on recently?",
-    "travel": "Hello Jonathan! Let's talk about travel. If you could fly anywhere in the world tomorrow, where would you go and why?",
-    "grammar": "Welcome to your grammar drill Jonathan! Let's speak in full sentences. Can you tell me what you did yesterday from morning to evening?"
-}
+    target_lang: Optional[str] = "en"
+    native_lang: Optional[str] = "de"
 
 @app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def serve_index():
@@ -196,13 +261,36 @@ async def reset_data_endpoint():
         "message": "All session turns, conversation history, mistakes, quiz attempts, and analysis data have been cleared."
     }
 
+@app.get("/api/languages")
+async def get_languages():
+    return {
+        "languages": [
+            {
+                "code": code,
+                "name": info["name"],
+                "native_name": info["native_name"],
+                "flag": info["flag"],
+                "default_voice": info["default_voice"],
+                "voices": VOICES_BY_LANG.get(code, []),
+                "scenarios": SCENARIOS_BY_LANG.get(code, {})
+            }
+            for code, info in SUPPORTED_LANGUAGES.items()
+        ]
+    }
+
 @app.post("/api/sessions/start")
 async def start_session_endpoint(req: StartSessionRequest):
     sid = req.session_id or f"session_{int(time.time()*1000)}"
     scenario = req.scenario or "casual"
-    database.create_session(sid, target_lang="en", native_lang="de", level=req.level or "B1", scenario=scenario)
+    target_lang = req.target_lang or "en"
+    if target_lang not in SUPPORTED_LANGUAGES:
+        target_lang = "en"
+    native_lang = req.native_lang or "de"
+
+    database.create_session(sid, target_lang=target_lang, native_lang=native_lang, level=req.level or "B1", scenario=scenario)
     
-    greeting = SCENARIO_GREETINGS.get(scenario, SCENARIO_GREETINGS["casual"])
+    lang_scenarios = SCENARIOS_BY_LANG.get(target_lang, SCENARIOS_BY_LANG["en"])
+    greeting = lang_scenarios.get(scenario, lang_scenarios.get("casual", "Hello Jonathan!"))
     turn_id = f"turn_{uuid.uuid4().hex[:10]}"
     database.record_turn(
         turn_id=turn_id,
@@ -215,14 +303,19 @@ async def start_session_endpoint(req: StartSessionRequest):
     return {
         "session_id": sid,
         "greeting": greeting,
-        "turn_id": turn_id
+        "turn_id": turn_id,
+        "target_lang": target_lang
     }
 
 @app.post("/api/stt")
-async def speech_to_text(request: Request):
+async def speech_to_text(request: Request, lang: Optional[str] = None):
     audio_bytes = await request.body()
     if not audio_bytes:
         raise HTTPException(status_code=400, detail="Audio payload required")
+
+    target_lang = lang or request.headers.get("x-target-language") or "en"
+    if target_lang not in SUPPORTED_LANGUAGES:
+        target_lang = "en"
 
     proc = await asyncio.create_subprocess_exec(
         "ffmpeg", "-threads", "4", "-i", "pipe:0", "-f", "wav", "-ar", "16000", "-ac", "1", "pipe:1",
@@ -234,6 +327,14 @@ async def speech_to_text(request: Request):
     if not wav_data or len(wav_data) < 1000:
         return {"text": ""}
 
+    prompts = {
+        "en": "Verbatim phonetic transcript of an ESL language learner. Transcribe every mistake, grammatical error, slip of the tongue, and exact word spoken without auto-correcting grammar or translating: mein name are Jonathan, he have, yesterday I go, she don't knows.",
+        "de": "Wortgetreues phonetisches Transkript eines Deutschlernenden. Transkribiere jeden Grammatikfehler, falschen Kasus, Versprecher und jedes Wort exakt ohne Autokorrektur: ich bin nach Hause gegangen, ich habe gegangen, der Mädchen, weil ich bin müde.",
+        "es": "Transcripción fonética literal de un estudiante de español. Transcribe cada error gramatical, palabra y fallo sin autocorrección: yo soy cansado, para tú, me gusto.",
+        "fr": "Transcription phonétique littérale d'un apprenant de français. Transcrivez chaque erreur grammaticale, mot et faute sans autocorrection: je suis allé, j'ai tombé, le table.",
+        "it": "Trascrizione fonetica letterale di uno studente d'italiano. Trascrivi ogni errore grammaticale e parola senza autocorrezione: io ho andato, la problema."
+    }
+
     async with _whisper_lock:
         loop = asyncio.get_running_loop()
         def transcribe():
@@ -241,8 +342,8 @@ async def speech_to_text(request: Request):
             wav_io = io.BytesIO(wav_data)
             segments, _ = model.transcribe(
                 wav_io,
-                language="en",
-                initial_prompt="Verbatim phonetic transcript of an ESL language learner. Transcribe every mistake, grammatical error, slip of the tongue, and exact word spoken without auto-correcting grammar or translating: mein name are Jonathan, he have, yesterday I go, she don't knows.",
+                language=target_lang,
+                initial_prompt=prompts.get(target_lang, prompts["en"]),
                 beam_size=1,
                 best_of=1,
                 temperature=0.0,
@@ -253,7 +354,7 @@ async def speech_to_text(request: Request):
             return " ".join([s.text for s in segments]).strip()
 
         text = await loop.run_in_executor(None, transcribe)
-        print(f"[STT] Transcribed verbatim: '{text}'", flush=True)
+        print(f"[STT][{target_lang}] Transcribed verbatim: '{text}'", flush=True)
 
     if (text.startswith("[") and text.endswith("]")) or (text.startswith("(") and text.endswith(")")):
         text = ""
@@ -266,15 +367,21 @@ async def speech_to_text(request: Request):
 
 @app.post("/api/chat")
 async def chat_endpoint(req: ChatRequest):
+    target_lang = req.target_lang or "en"
+    if target_lang not in SUPPORTED_LANGUAGES:
+        target_lang = "en"
+    native_lang = req.native_lang or "de"
+
     topic_context = ""
     if req.topic and req.topic != "casual":
         topic_context = f"\nCURRENT SCENARIO/TOPIC: {req.topic.capitalize()} mode. Guide the conversation around this theme."
 
     session_id = req.session_id or "default_session"
-    database.create_session(session_id, target_lang="en", native_lang="de", level="B1", scenario=req.topic or "casual")
+    database.create_session(session_id, target_lang=target_lang, native_lang=native_lang, level="B1", scenario=req.topic or "casual")
 
+    system_prompt = get_system_prompt(target_lang=target_lang, native_lang=native_lang)
     user_last_msg = ""
-    messages = [{"role": "system", "content": SYSTEM_PROMPT + topic_context}]
+    messages = [{"role": "system", "content": system_prompt + topic_context}]
     for m in req.messages:
         messages.append({"role": m.role, "content": m.content})
         if m.role == "user":
@@ -326,7 +433,7 @@ async def chat_endpoint(req: ChatRequest):
             # Process completed turn and persist to database
             turn_id = f"turn_{uuid.uuid4().hex[:10]}"
             correction_summary = ""
-            topic_key = "en_other"
+            topic_key = f"{target_lang}_other"
             original_snippet = ""
             corrected_snippet = ""
             spoken_text = ""
@@ -352,13 +459,22 @@ async def chat_endpoint(req: ChatRequest):
             corrections = []
             is_error = False
             lower_corr = correction_summary.lower()
-            if correction_summary and not any(k in lower_corr for k in ["none", "spot on", "perfect", "flawless", "great english"]):
+            flawless_markers = ["none", "spot on", "perfect", "flawless", "great", "kein fehler", "perfekt", "excelente", "bravo", "sans faute"]
+            if correction_summary and not any(k in lower_corr for k in flawless_markers):
                 is_error = True
                 mistake_id = f"m_{uuid.uuid4().hex[:10]}"
                 
-                # Validate topic key
-                if topic_key not in TOPICS.get("en", {}):
-                    topic_key = "en_subject_verb_agreement" if any(w in lower_corr for w in ["name is", "subject", "verb", "agreement"]) else "en_other"
+                # Validate topic key against target language topics
+                lang_topics = TOPICS.get(target_lang, TOPICS.get("en", {}))
+                if topic_key not in lang_topics:
+                    # Check if key exists in another language list
+                    found_key = False
+                    for l_code, l_dict in TOPICS.items():
+                        if topic_key in l_dict:
+                            found_key = True
+                            break
+                    if not found_key:
+                        topic_key = f"{target_lang}_other"
 
                 corrections.append({
                     "id": mistake_id,
@@ -402,14 +518,25 @@ async def exclude_mistake_endpoint(mistake_id: str, req: ExcludeMistakeRequest):
     return {"status": "excluded", "mistake_id": mistake_id, "reason": req.reason}
 
 @app.get("/api/mistakes")
-async def list_active_mistakes(session_id: Optional[str] = None):
+async def list_active_mistakes(session_id: Optional[str] = None, lang: Optional[str] = None):
+    target_lang = lang or "en"
+    if session_id:
+        s_lang = database.get_session_lang(session_id)
+        if s_lang:
+            target_lang = s_lang
     mistakes = database.get_active_mistakes(session_id=session_id, limit=30)
     for m in mistakes:
-        m["topic_label"] = get_topic_label(m["topic"])
+        m["topic_label"] = get_topic_label(m["topic"], lang=target_lang)
     return {"mistakes": mistakes}
 
 @app.post("/api/quiz/generate")
-async def generate_quiz_endpoint(session_id: Optional[str] = None):
+async def generate_quiz_endpoint(session_id: Optional[str] = None, lang: Optional[str] = None):
+    target_lang = lang or "en"
+    if session_id:
+        s_lang = database.get_session_lang(session_id)
+        if s_lang:
+            target_lang = s_lang
+
     active_mistakes = database.get_active_mistakes(session_id=session_id, limit=5)
     if not active_mistakes:
         return {
@@ -424,7 +551,7 @@ async def generate_quiz_endpoint(session_id: Optional[str] = None):
             f"Mistake {idx+1} [ID: {m['id']}]:\n"
             f"- User said: \"{m['original']}\"\n"
             f"- Correction: \"{m['corrected']}\"\n"
-            f"- Grammar Topic: {m['topic']}\n"
+            f"- Grammar Topic: {m['topic']} ({get_topic_label(m['topic'], lang=target_lang)})\n"
             f"- Explanation: {m['explanation']}"
         )
 
@@ -438,7 +565,7 @@ async def generate_quiz_endpoint(session_id: Optional[str] = None):
         "  \"questions\": [\n"
         "    {\n"
         "      \"mistake_id\": \"<exact ID of the mistake from above>\",\n"
-        "      \"question\": \"<The quiz question, e.g. Choose the correct sentence to introduce yourself:>\",\n"
+        "      \"question\": \"<The quiz question in the target language>\",\n"
         "      \"options\": [\"<Option 1>\", \"<Option 2>\", \"<Option 3>\", \"<Option 4>\"],\n"
         "      \"correct_answer\": \"<Exact match of one of the options>\",\n"
         "      \"source_said\": \"<What the user originally said>\",\n"
@@ -490,7 +617,7 @@ async def generate_quiz_endpoint(session_id: Optional[str] = None):
             ],
             "correct_answer": m["corrected"],
             "source_said": m["original"],
-            "explanation": m["explanation"] or f"Topic: {get_topic_label(m['topic'])}"
+            "explanation": m["explanation"] or f"Topic: {get_topic_label(m['topic'], lang=target_lang)}"
         })
 
     return {"questions": fallback_questions}

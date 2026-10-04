@@ -92,6 +92,14 @@ def create_session(session_id: str, target_lang: str = "en", native_lang: str = 
         )
     conn.close()
 
+def get_session_lang(session_id: str) -> Optional[str]:
+    conn = get_connection()
+    row = conn.execute("SELECT target_lang FROM sessions WHERE id = ?", (session_id,)).fetchone()
+    conn.close()
+    if row and row["target_lang"]:
+        return row["target_lang"]
+    return None
+
 def record_turn(
     turn_id: str,
     session_id: str,

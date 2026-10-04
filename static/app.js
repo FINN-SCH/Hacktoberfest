@@ -1,11 +1,242 @@
-/* English Voice Language Coach & Quiz Tutor - Optimized Frontend Application */
+/* Voice Language Coach & Quiz Tutor - Multi-Language Frontend Application */
+
+// Language & Locale Configurations
+const LANG_DATA = {
+  en: {
+    name: "English",
+    flag: "🇬🇧",
+    defaultVoice: "en-US-AndrewNeural",
+    voices: [
+      { id: "en-US-AndrewNeural", name: "Andrew (US · Natural & Warm)" },
+      { id: "en-US-AvaNeural", name: "Ava (US · Clear & Expressive)" },
+      { id: "en-GB-RyanNeural", name: "Ryan (UK · Articulate)" },
+      { id: "en-GB-SoniaNeural", name: "Sonia (UK · Bright)" }
+    ],
+    greeting: "Hello Jonathan! I am your English conversation coach. What would you like to discuss today?",
+    starters: [
+      { label: "Job interview practice", text: "Hi! Can you help me practice for a tech job interview?" },
+      { label: "Check my grammar", text: "Yesterday I go to the supermarket and buyed some apples." },
+      { label: "Fluency advice", text: "What are your top three tips for improving my English fluency?" },
+      { label: "Tech discussion", text: "Let us have a debate about artificial intelligence and system architecture." }
+    ],
+    placeholder: "Type a sentence or prompt to practice...",
+    emptyTranscript: "Click the microphone or press Spacebar to start speaking.",
+    listeningText: "Listening to your English...",
+    connectingText: "Connecting to coach...",
+    voiceTest: "Hello Jonathan! Your neural voice output is functioning smoothly on the RTX 5090."
+  },
+  de: {
+    name: "Deutsch",
+    flag: "🇩🇪",
+    defaultVoice: "de-DE-ConradNeural",
+    voices: [
+      { id: "de-DE-ConradNeural", name: "Conrad (DE · Warm & Klar)" },
+      { id: "de-DE-KatjaNeural", name: "Katja (DE · Natürlich & Freundlich)" },
+      { id: "de-DE-KillianNeural", name: "Killian (DE · Dynamisch)" }
+    ],
+    greeting: "Hallo Jonathan! Ich bin dein Deutsch-Konversations-Coach. Worüber möchtest du heute sprechen?",
+    starters: [
+      { label: "Bewerbungstraining", text: "Hallo! Kannst du mir helfen, für ein Vorstellungsgespräch zu üben?" },
+      { label: "Grammatik prüfen", text: "Gestern ich habe gegangen in die Stadt und ein Buch gekauft." },
+      { label: "Tipps für fließendes Deutsch", text: "Was sind deine besten Tipps, um mein Deutsch zu verbessern?" },
+      { label: "Tech-Diskussion", text: "Lass uns über künstliche Intelligenz und moderne Systemarchitektur sprechen." }
+    ],
+    placeholder: "Satz oder Frage zum Üben eingeben...",
+    emptyTranscript: "Mikrofon anklicken oder Leertaste drücken, um zu sprechen.",
+    listeningText: "Höre dir auf Deutsch zu...",
+    connectingText: "Verbinde mit dem Coach...",
+    voiceTest: "Hallo Jonathan! Deine neuronale Sprachausgabe läuft einwandfrei auf der RTX 5090."
+  },
+  es: {
+    name: "Español",
+    flag: "🇪🇸",
+    defaultVoice: "es-ES-AlvaroNeural",
+    voices: [
+      { id: "es-ES-AlvaroNeural", name: "Álvaro (ES · Natural)" },
+      { id: "es-ES-ElviraNeural", name: "Elvira (ES · Clara y Expresiva)" }
+    ],
+    greeting: "¡Hola Jonathan! Soy tu tutor de conversación en español. ¿De qué te gustaría hablar hoy?",
+    starters: [
+      { label: "Práctica de entrevista", text: "¡Hola! ¿Puedes ayudarme a practicar para una entrevista técnica?" },
+      { label: "Comprobar gramática", text: "Ayer yo he ido al mercado y compré unas manzanas frescas." },
+      { label: "Consejos de fluidez", text: "¿Cuáles son tus mejores consejos para hablar español con más soltura?" },
+      { label: "Charla técnica", text: "Tengamos un debate sobre inteligencia artificial y arquitectura de software." }
+    ],
+    placeholder: "Escribe una frase o tema para practicar...",
+    emptyTranscript: "Haz clic en el micrófono o presiona Espacio para comenzar a hablar.",
+    listeningText: "Escuchando tu español...",
+    connectingText: "Conectando con el tutor...",
+    voiceTest: "¡Hola Jonathan! Tu síntesis de voz neuronal funciona perfectamente en la RTX 5090."
+  },
+  fr: {
+    name: "Français",
+    flag: "🇫🇷",
+    defaultVoice: "fr-FR-HenriNeural",
+    voices: [
+      { id: "fr-FR-HenriNeural", name: "Henri (FR · Chaleureux)" },
+      { id: "fr-FR-DeniseNeural", name: "Denise (FR · Articulée)" }
+    ],
+    greeting: "Bonjour Jonathan ! Je suis ton coach de conversation en français. De quoi aimerais-tu parler aujourd'hui ?",
+    starters: [
+      { label: "Entraînement entretien", text: "Bonjour ! Peux-tu m'entraîner pour un entretien technique ?" },
+      { label: "Vérifier ma grammaire", text: "Hier je suis allé au magasin et j'ai acheté des pommes." },
+      { label: "Conseils d'aisance", text: "Quels sont tes meilleurs conseils pour améliorer mon expression orale ?" },
+      { label: "Discussion technique", text: "Débattons sur l'intelligence artificielle et l'architecture logicielle." }
+    ],
+    placeholder: "Tapez une phrase ou un sujet pour vous entraîner...",
+    emptyTranscript: "Cliquez sur le micro ou appuyez sur Espace pour parler.",
+    listeningText: "Écoute de votre français...",
+    connectingText: "Connexion au coach...",
+    voiceTest: "Bonjour Jonathan ! La synthèse vocale neuronale fonctionne à merveille sur la RTX 5090."
+  },
+  it: {
+    name: "Italiano",
+    flag: "🇮🇹",
+    defaultVoice: "it-IT-DiegoNeural",
+    voices: [
+      { id: "it-IT-DiegoNeural", name: "Diego (IT · Naturale)" },
+      { id: "it-IT-ElsaNeural", name: "Elsa (IT · Espressiva)" }
+    ],
+    greeting: "Ciao Jonathan! Sono il tuo tutor di conversazione in italiano. Di cosa vorresti parlare oggi?",
+    starters: [
+      { label: "Pratica colloquio", text: "Ciao! Puoi aiutarmi a fare pratica per un colloquio di lavoro?" },
+      { label: "Controlla la grammatica", text: "Ieri sono andato in centro e ho comprato dei libri." },
+      { label: "Consigli di fluidità", text: "Quali sono i tuoi migliori consigli per migliorare il mio italiano?" },
+      { label: "Discussione tecnica", text: "Facciamo una discussione sull'intelligenza artificiale e l'architettura software." }
+    ],
+    placeholder: "Scrivi una frase per esercitarti...",
+    emptyTranscript: "Fai clic sul microfono o premi Spazio per parlare.",
+    listeningText: "Ascolto del tuo italiano...",
+    connectingText: "Connessione al tutor...",
+    voiceTest: "Ciao Jonathan! La sintesi vocale neurale funziona senza problemi sulla RTX 5090."
+  }
+};
+
+const UI_TRANSLATIONS = {
+  en: {
+    brandTitle: "Language Coach",
+    brandSubtitle: "Real-Time Conversation Practice & Feedback",
+    tabVoice: "Conversation",
+    tabQuiz: "Practice Quiz",
+    tabAnalysis: "Analysis",
+    tabSettings: "Settings",
+    tapToSpeak: "Tap to speak",
+    listening: "Listening...",
+    thinking: "Processing...",
+    speaking: "Coach speaking...",
+    ready: "Ready",
+    handsFreeOn: "Hands-Free: ON",
+    handsFreeOff: "Hands-Free: OFF",
+    pressSpace: "Press Space to toggle microphone",
+    quizTitle: "Practice Your Weaknesses",
+    quizSubtitle: "Targeted quiz questions generated strictly from your real conversation mistakes.",
+    quizFresh: "Fresh Questions",
+    quizEmptyTitle: "No active mistakes yet",
+    quizEmptyDesc: "Talk in Conversation mode. Any grammar or vocabulary slip will automatically turn into a personalized practice quiz here.",
+    quizGoConv: "Go to Conversation",
+    analysisTitle: "Cross-Session Analysis",
+    analysisSubtitle: "Long-term tracking of grammar accuracy, recurring patterns, and fluency trends.",
+    kpiAccLabel: "Error-Free Turns",
+    kpiAccSub: "Overall grammatical consistency",
+    kpiTurnsLabel: "Spoken Turns",
+    kpiErrorsLabel: "Active Corrections",
+    kpiErrorsSub: "Excluding dismissed slips",
+    coachDiagnosisTitle: "Coach Diagnosis & Recommendations",
+    topicFreqTitle: "Mistake Frequency by Grammar Topic",
+    thTopic: "Topic",
+    thErrors: "Errors",
+    thShare: "Share",
+    thSessions: "Sessions",
+    thLastSeen: "Last Seen",
+    recurringTitle: "Recurring Slips",
+    settingsTitle: "Settings & System Status",
+    settingsSubtitle: "Hardware configuration, model parameters, and storage management.",
+    settingsCheck: "Check",
+    pipeTitle: "Local Pipeline Infrastructure",
+    settingsLangTitle: "Language, Voice & Scenario Settings",
+    lblPracticeLang: "Practice Language",
+    lblVoice: "Active Voice",
+    lblScenario: "Active Scenario",
+    lblUILang: "Interface Language",
+    btnTestVoice: "Test Voice Output",
+    testVoiceTip: "Synthesizes a short test sample via Edge-TTS and plays back locally.",
+    dataMgmtTitle: "Data Management",
+    clearHistoryHeading: "Clear Conversation History & Database",
+    clearHistoryDesc: "Deletes all spoken turns, mistake logs, quiz records, and aggregated analytics from tutor.db.",
+    btnClearHistory: "Clear History",
+    scenarioCasual: "Casual Conversation",
+    scenarioInterview: "Job Interview Practice",
+    scenarioTech: "Tech & Architecture",
+    scenarioTravel: "Travel & Daily Life",
+    scenarioGrammar: "Grammar Focus & Drills"
+  },
+  de: {
+    brandTitle: "Sprach-Coach",
+    brandSubtitle: "Echtzeit-Sprachtraining & Grammatik-Feedback",
+    tabVoice: "Konversation",
+    tabQuiz: "Übungs-Quiz",
+    tabAnalysis: "Analyse",
+    tabSettings: "Einstellungen",
+    tapToSpeak: "Tippen zum Sprechen",
+    listening: "Höre zu...",
+    thinking: "Verarbeite...",
+    speaking: "Coach spricht...",
+    ready: "Bereit",
+    handsFreeOn: "Freisprechen: AN",
+    handsFreeOff: "Freisprechen: AUS",
+    pressSpace: "Leertaste drücken, um Mikrofon umzuschalten",
+    quizTitle: "Schwachstellen gezielt üben",
+    quizSubtitle: "Interaktive Quiz-Fragen, die exakt aus deinen realen Sprachfehlern generiert werden.",
+    quizFresh: "Neue Fragen",
+    quizEmptyTitle: "Noch keine aktiven Fehler",
+    quizEmptyDesc: "Sprich im Konversations-Modus. Jeder Grammatik- oder Wortfehler wird hier automatisch zu einer maßgeschneiderten Übung.",
+    quizGoConv: "Zur Konversation",
+    analysisTitle: "Lernfortschritt & Analyse",
+    analysisSubtitle: "Langzeit-Auswertung deiner Grammatik-Genauigkeit, wiederkehrenden Muster und Sprachflüssigkeit.",
+    kpiAccLabel: "Fehlerfreie Runden",
+    kpiAccSub: "Grammatikalische Zuverlässigkeit",
+    kpiTurnsLabel: "Gesprochene Sätze",
+    kpiErrorsLabel: "Aktive Korrekturen",
+    kpiErrorsSub: "Ohne ignorierte Versprecher",
+    coachDiagnosisTitle: "Diagnose & Empfehlungen des Coaches",
+    topicFreqTitle: "Fehlerhäufigkeit nach Grammatik-Thema",
+    thTopic: "Thema",
+    thErrors: "Fehler",
+    thShare: "Anteil",
+    thSessions: "Sessions",
+    thLastSeen: "Zuletzt",
+    recurringTitle: "Wiederkehrende Fehler",
+    settingsTitle: "Einstellungen & Systemstatus",
+    settingsSubtitle: "Hardware-Konfiguration, Sprachauswahl und Speicherverwaltung.",
+    settingsCheck: "Prüfen",
+    pipeTitle: "Lokale Pipeline-Infrastruktur",
+    settingsLangTitle: "Sprach-, Stimmen- & Szenario-Einstellungen",
+    lblPracticeLang: "Lernsprache",
+    lblVoice: "Aktive Stimme",
+    lblScenario: "Aktives Szenario",
+    lblUILang: "Benutzeroberfläche",
+    btnTestVoice: "Stimme testen",
+    testVoiceTip: "Erzeugt eine kurze Sprachprobe via Edge-TTS und gibt sie lokal wieder.",
+    dataMgmtTitle: "Datenverwaltung",
+    clearHistoryHeading: "Verlauf & Datenbank leeren",
+    clearHistoryDesc: "Löscht alle Sprachrunden, Fehlerprotokolle, Quiz-Ergebnisse und Analysen aus tutor.db.",
+    btnClearHistory: "Verlauf löschen",
+    scenarioCasual: "Lockerer Plausch",
+    scenarioInterview: "Bewerbungsgespräch",
+    scenarioTech: "Tech & Architektur",
+    scenarioTravel: "Reisen & Alltag",
+    scenarioGrammar: "Grammatik-Fokus & Drills"
+  }
+};
 
 // State
 let appState = "idle"; // "idle" | "listening" | "thinking" | "speaking"
 let isContinuousMode = false;
 let isSessionStarted = false;
+let currentLanguage = localStorage.getItem("jarvis_coach_lang") || "en";
+let uiLanguage = localStorage.getItem("jarvis_ui_lang") || "en";
 let currentScenario = "casual";
-let currentVoice = "en-US-AndrewNeural";
+let currentVoice = LANG_DATA[currentLanguage]?.defaultVoice || "en-US-AndrewNeural";
 let currentSessionId = "session_" + Date.now();
 let lastMistakeId = null;
 
@@ -46,6 +277,8 @@ const canvasCtx = canvasEl.getContext("2d");
 const continuousBtn = document.getElementById("continuous-btn");
 const continuousLabel = document.getElementById("continuous-label");
 const textInput = document.getElementById("text-input");
+const languageSelect = document.getElementById("language-select");
+const uiLangSelect = document.getElementById("ui-lang-select");
 const scenarioSelect = document.getElementById("scenario-select");
 const voiceSelect = document.getElementById("voice-select");
 const quizBadge = document.getElementById("quiz-badge");
@@ -115,23 +348,25 @@ function setUIState(newState) {
   orbWrapper.className = "orb-wrapper " + (newState === "idle" ? "" : newState);
   statusDot.className = "status-dot " + (newState === "idle" ? "" : newState);
 
+  const t = UI_TRANSLATIONS[uiLanguage] || UI_TRANSLATIONS.en;
+
   if (newState === "idle") {
     if (!isSessionStarted) {
-      orbLabel.textContent = "START CHAT";
-      statusText.textContent = "READY TO START";
+      orbLabel.textContent = t.tapToSpeak;
+      statusText.textContent = t.ready;
     } else {
-      orbLabel.textContent = isContinuousMode ? "LISTENING..." : "TAP TO SPEAK";
-      statusText.textContent = isContinuousMode ? "HANDS-FREE ON" : "READY";
+      orbLabel.textContent = isContinuousMode ? t.listening : t.tapToSpeak;
+      statusText.textContent = isContinuousMode ? t.handsFreeOn : t.ready;
     }
   } else if (newState === "listening") {
-    orbLabel.textContent = "LISTENING...";
-    statusText.textContent = "LISTENING";
+    orbLabel.textContent = t.listening;
+    statusText.textContent = t.listening.replace("...", "");
   } else if (newState === "thinking") {
-    orbLabel.textContent = "THINKING...";
-    statusText.textContent = "COACH THINKING";
+    orbLabel.textContent = t.thinking;
+    statusText.textContent = t.thinking.replace("...", "");
   } else if (newState === "speaking") {
-    orbLabel.textContent = "COACH TALKING";
-    statusText.textContent = "COACH SPEAKING";
+    orbLabel.textContent = t.speaking;
+    statusText.textContent = t.speaking.replace("...", "");
   }
 }
 
@@ -143,28 +378,35 @@ function drawVisualizer() {
   analyser.getByteFrequencyData(dataArray);
   canvasCtx.clearRect(0, 0, canvasEl.width, canvasEl.height);
 
-  const barWidth = (canvasEl.width / dataArray.length) * 2.2;
-  let barHeight;
-  let x = 0;
+  const numBars = 32;
+  const barWidth = 3;
+  const gap = 3;
+  const totalWidth = numBars * barWidth + (numBars - 1) * gap;
+  const startX = (canvasEl.width - totalWidth) / 2;
+  const centerY = canvasEl.height / 2;
+  const step = Math.max(1, Math.floor(dataArray.length / numBars));
 
-  for (let i = 0; i < dataArray.length; i++) {
-    barHeight = (dataArray[i] / 255) * canvasEl.height * 0.85;
+  for (let i = 0; i < numBars; i++) {
+    const val = dataArray[i * step] || 0;
+    const barHeight = Math.max(2, (val / 255) * (canvasEl.height - 4));
+    const x = startX + i * (barWidth + gap);
+    const y = centerY - barHeight / 2;
 
-    const grad = canvasCtx.createLinearGradient(0, canvasEl.height, 0, 0);
     if (appState === "listening") {
-      grad.addColorStop(0, "rgba(6, 182, 212, 0.2)");
-      grad.addColorStop(1, "#06b6d4");
+      canvasCtx.fillStyle = "rgba(56, 189, 248, 0.85)";
     } else if (appState === "speaking") {
-      grad.addColorStop(0, "rgba(16, 185, 129, 0.2)");
-      grad.addColorStop(1, "#10b981");
+      canvasCtx.fillStyle = "rgba(16, 185, 129, 0.85)";
     } else {
-      grad.addColorStop(0, "rgba(99, 102, 241, 0.2)");
-      grad.addColorStop(1, "#6366f1");
+      canvasCtx.fillStyle = "rgba(148, 163, 184, 0.25)";
     }
 
-    canvasCtx.fillStyle = grad;
-    canvasCtx.fillRect(x, canvasEl.height - barHeight, barWidth - 1, barHeight);
-    x += barWidth + 1;
+    if (canvasCtx.roundRect) {
+      canvasCtx.beginPath();
+      canvasCtx.roundRect(x, y, barWidth, barHeight, 1.5);
+      canvasCtx.fill();
+    } else {
+      canvasCtx.fillRect(x, y, barWidth, barHeight);
+    }
   }
 }
 
@@ -288,9 +530,12 @@ async function processAudioTurn(audioBlob) {
   userTranscript.textContent = "Transcribing with Faster-Whisper...";
 
   try {
-    const sttRes = await fetch("/api/stt", {
+    const sttRes = await fetch(`/api/stt?lang=${encodeURIComponent(currentLanguage)}`, {
       method: "POST",
-      headers: { "Content-Type": audioBlob.type || "audio/webm" },
+      headers: {
+        "Content-Type": audioBlob.type || "audio/webm",
+        "X-Target-Language": currentLanguage
+      },
       body: audioBlob
     });
 
@@ -336,7 +581,9 @@ async function executeCoachTurn(userInput) {
         messages: conversationHistory,
         topic: currentScenario,
         voice: currentVoice,
-        session_id: currentSessionId
+        session_id: currentSessionId,
+        target_lang: currentLanguage,
+        native_lang: "de"
       })
     });
 
@@ -454,20 +701,25 @@ function parseAndRenderCoachOutput(raw, isFinal = false) {
     feedbackText.textContent = correction;
 
     const lower = correction.toLowerCase();
-    const isFlawless = lower.includes("none") || lower.includes("perfect") || lower.includes("flawless") || lower.includes("spot on") || lower.includes("great english");
+    const flawlessMarkers = ["none", "perfect", "flawless", "spot on", "great", "kein fehler", "perfekt", "excelente", "bravo", "sans faute"];
+    const isFlawless = flawlessMarkers.some(k => lower.includes(k));
 
     if (isFlawless) {
       feedbackBanner.classList.add("correct");
-      feedbackIcon.textContent = "✅";
-      feedbackTopicBadge.textContent = "EXCELLENT";
+      feedbackIcon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+      feedbackTopicBadge.textContent = "ACCURACY";
       feedbackActions.style.display = "none";
     } else {
       feedbackBanner.classList.remove("correct");
-      feedbackIcon.textContent = "💡";
+      feedbackIcon.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
       if (topic && topic !== "none") {
-        feedbackTopicBadge.textContent = topic.replace("en_", "").replace(/_/g, " ").toUpperCase();
+        let cleanTopic = topic;
+        ["en_", "de_", "es_", "fr_", "it_"].forEach(p => {
+          if (cleanTopic.startsWith(p)) cleanTopic = cleanTopic.slice(p.length);
+        });
+        feedbackTopicBadge.textContent = cleanTopic.replace(/_/g, " ").toUpperCase();
       } else {
-        feedbackTopicBadge.textContent = "GRAMMAR";
+        feedbackTopicBadge.textContent = "GRAMMAR SLIP";
       }
     }
   }
@@ -577,8 +829,9 @@ async function loadQuiz(forceRefresh = false) {
   const emptyEl = document.getElementById("quiz-empty");
   const cardsEl = document.getElementById("quiz-cards");
 
+  if (!loadingEl || !emptyEl || !cardsEl) return;
+
   if (!forceRefresh && quizQuestions.length > 0) {
-    renderQuizQuestions(quizQuestions);
     return;
   }
 
@@ -587,7 +840,7 @@ async function loadQuiz(forceRefresh = false) {
   cardsEl.innerHTML = "";
 
   try {
-    const res = await fetch(`/api/quiz/generate?session_id=${encodeURIComponent(currentSessionId)}`, {
+    const res = await fetch(`/api/quiz/generate?session_id=${encodeURIComponent(currentSessionId)}&lang=${encodeURIComponent(currentLanguage)}`, {
       method: "POST"
     });
     const data = await res.json();
@@ -598,6 +851,7 @@ async function loadQuiz(forceRefresh = false) {
       quizBadge.textContent = quizQuestions.length;
       quizBadge.style.display = quizQuestions.length > 0 ? "inline-block" : "none";
     }
+
     if (quizQuestions.length === 0) {
       emptyEl.style.display = "block";
     } else {
@@ -612,6 +866,7 @@ async function loadQuiz(forceRefresh = false) {
 
 function renderQuizQuestions(questions) {
   const cardsEl = document.getElementById("quiz-cards");
+  if (!cardsEl) return;
   cardsEl.innerHTML = "";
 
   questions.forEach((q, qIdx) => {
@@ -646,8 +901,9 @@ async function answerQuizQuestion(qIdx, oIdx) {
   const q = quizQuestions[qIdx];
   if (!q) return;
 
-  const chosenOpt = q.options[oIdx];
+  const chosenOpt = (q.options || [])[oIdx];
   const container = document.getElementById(`opts-${qIdx}`);
+  if (!container) return;
   const buttons = container.querySelectorAll(".quiz-option-btn");
   buttons.forEach(b => b.disabled = true);
 
@@ -656,7 +912,7 @@ async function answerQuizQuestion(qIdx, oIdx) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        mistake_id: q.mistake_id,
+        mistake_id: String(q.mistake_id || ""),
         question_text: q.question,
         user_answer: chosenOpt,
         correct_answer: q.correct_answer
@@ -666,22 +922,83 @@ async function answerQuizQuestion(qIdx, oIdx) {
 
     const clickedBtn = document.getElementById(`opt-${qIdx}-${oIdx}`);
     if (result.is_correct) {
-      clickedBtn.classList.add("correct");
+      if (clickedBtn) clickedBtn.classList.add("correct");
     } else {
-      clickedBtn.classList.add("wrong");
+      if (clickedBtn) clickedBtn.classList.add("wrong");
       buttons.forEach(b => {
-        if (b.textContent.trim().toLowerCase() === q.correct_answer.trim().toLowerCase()) {
+        if (b.textContent.trim().toLowerCase() === (q.correct_answer || "").trim().toLowerCase()) {
           b.classList.add("correct");
         }
       });
     }
 
     const expEl = document.getElementById(`exp-${qIdx}`);
-    expEl.style.display = "block";
-    expEl.innerHTML = `<strong>${result.is_correct ? '✅ Correct!' : '❌ Not quite.'}</strong> ${escapeHtml(q.explanation || '')}`;
+    if (expEl) {
+      expEl.style.display = "block";
+      expEl.innerHTML = `<strong>${result.is_correct ? '✅ Correct!' : '❌ Not quite.'}</strong> ${escapeHtml(q.explanation || '')}`;
+    }
   } catch (e) {
     console.error("Grade error:", e);
   }
+}
+
+function launchCelebrationConfetti() {
+  const canvas = document.createElement("canvas");
+  canvas.style.position = "fixed";
+  canvas.style.inset = "0";
+  canvas.style.width = "100vw";
+  canvas.style.height = "100vh";
+  canvas.style.pointerEvents = "none";
+  canvas.style.zIndex = "9999";
+  document.body.appendChild(canvas);
+
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const particles = [];
+  const colors = ["#10b981", "#38bdf8", "#f59e0b", "#6366f1", "#ec4899"];
+
+  for (let i = 0; i < 70; i++) {
+    particles.push({
+      x: canvas.width / 2,
+      y: canvas.height * 0.45,
+      vx: (Math.random() - 0.5) * 14,
+      vy: (Math.random() - 0.8) * 14,
+      size: Math.random() * 6 + 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rotation: Math.random() * 360,
+      rotationSpeed: (Math.random() - 0.5) * 8,
+      opacity: 1
+    });
+  }
+
+  const startTime = Date.now();
+  function animate() {
+    const elapsed = Date.now() - startTime;
+    if (elapsed > 2200) {
+      canvas.remove();
+      return;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.25;
+      p.rotation += p.rotationSpeed;
+      p.opacity = Math.max(0, 1 - elapsed / 2200);
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rotation * Math.PI) / 180);
+      ctx.globalAlpha = p.opacity;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+      ctx.restore();
+    });
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
 }
 
 function escapeHtml(text) {
@@ -694,8 +1011,9 @@ async function startConversationFlow() {
   await ensureAudioContext();
   isSessionStarted = true;
   setUIState("thinking");
-  coachResponse.textContent = "Connecting to coach...";
-  userTranscript.textContent = "Coach is starting our conversation...";
+  const info = LANG_DATA[currentLanguage] || LANG_DATA.en;
+  coachResponse.textContent = info.connectingText;
+  userTranscript.textContent = (UI_TRANSLATIONS[uiLanguage] || UI_TRANSLATIONS.en).tabVoice + "...";
   userTranscript.classList.remove("empty");
 
   try {
@@ -705,7 +1023,9 @@ async function startConversationFlow() {
       body: JSON.stringify({
         session_id: currentSessionId,
         scenario: currentScenario,
-        voice: currentVoice
+        voice: currentVoice,
+        target_lang: currentLanguage,
+        native_lang: "de"
       })
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -718,7 +1038,7 @@ async function startConversationFlow() {
     queueTTS(data.greeting);
   } catch (err) {
     console.error("Start error:", err);
-    coachResponse.textContent = "Hello Jonathan! How are you doing today?";
+    coachResponse.textContent = info.greeting;
     conversationHistory = [{ role: "assistant", content: coachResponse.textContent }];
     queueTTS(coachResponse.textContent);
   }
@@ -750,7 +1070,8 @@ function handleOrbClick() {
 function toggleContinuousMode() {
   isContinuousMode = !isContinuousMode;
   continuousBtn.classList.toggle("active", isContinuousMode);
-  continuousLabel.textContent = isContinuousMode ? "Hands-Free: ON" : "Hands-Free: OFF";
+  const t = UI_TRANSLATIONS[uiLanguage] || UI_TRANSLATIONS.en;
+  continuousLabel.textContent = isContinuousMode ? t.handsFreeOn : t.handsFreeOff;
 
   if (isContinuousMode && appState === "idle") {
     if (!isSessionStarted) {
@@ -774,9 +1095,9 @@ function changeScenario(val) {
   isSessionStarted = false;
   conversationHistory = [];
   setUIState("idle");
-  userTranscript.textContent = `Scenario set to ${val}. Tap the orb to have the coach begin!`;
+  userTranscript.textContent = `Scenario set to ${val}. Click the microphone to start speaking.`;
   userTranscript.classList.remove("empty");
-  coachResponse.textContent = "Tap the orb to start our " + val + " conversation.";
+  coachResponse.textContent = `Scenario ready. Click the microphone to start our ${val} practice.`;
 }
 
 function changeVoice(val) {
@@ -790,6 +1111,189 @@ function changeVoice(val) {
     ttsVoiceEl.textContent = `Voice: ${val} (audio/mpeg MP3)`;
   }
   console.log("Voice changed to:", val);
+}
+
+function changeLanguage(val, startFresh = true) {
+  if (!LANG_DATA[val]) val = "en";
+  currentLanguage = val;
+  localStorage.setItem("jarvis_coach_lang", val);
+
+  if (languageSelect && languageSelect.value !== val) {
+    languageSelect.value = val;
+  }
+  const settingsLangSelect = document.getElementById("settings-language-select");
+  if (settingsLangSelect && settingsLangSelect.value !== val) {
+    settingsLangSelect.value = val;
+  }
+
+  const info = LANG_DATA[val];
+  currentVoice = info.defaultVoice;
+  updateVoiceDropdowns(val);
+  renderStarters(val);
+
+  if (textInput) {
+    textInput.placeholder = info.placeholder;
+  }
+
+  if (startFresh || !isSessionStarted) {
+    userTranscript.textContent = info.emptyTranscript;
+    userTranscript.classList.add("empty");
+    coachResponse.textContent = `"${info.greeting}"`;
+    currentSessionId = "session_" + Date.now();
+    isSessionStarted = false;
+    conversationHistory = [];
+    setUIState("idle");
+    updateQuizBadge(0);
+  }
+
+  console.log("Practice language set to:", val, "Voice:", currentVoice);
+}
+
+function updateVoiceDropdowns(lang) {
+  const info = LANG_DATA[lang] || LANG_DATA.en;
+  const buildOptions = () => {
+    return info.voices.map(v => `<option value="${v.id}">${v.name}</option>`).join("");
+  };
+
+  if (voiceSelect) {
+    voiceSelect.innerHTML = buildOptions();
+    voiceSelect.value = currentVoice;
+  }
+  const settingsVoiceSelect = document.getElementById("settings-voice-select");
+  if (settingsVoiceSelect) {
+    settingsVoiceSelect.innerHTML = buildOptions();
+    settingsVoiceSelect.value = currentVoice;
+  }
+  const ttsVoiceEl = document.getElementById("settings-tts-voice");
+  if (ttsVoiceEl) {
+    ttsVoiceEl.textContent = `Voice: ${currentVoice} (audio/mpeg MP3)`;
+  }
+}
+
+function renderStarters(lang) {
+  const container = document.getElementById("topic-chips");
+  if (!container) return;
+  const info = LANG_DATA[lang] || LANG_DATA.en;
+  container.innerHTML = info.starters.map(s => `
+    <button type="button" class="topic-chip" onclick="quickSend('${escapeHtml(s.text)}')">${escapeHtml(s.label)}</button>
+  `).join("");
+}
+
+function changeUILanguage(val) {
+  if (!UI_TRANSLATIONS[val]) val = "en";
+  uiLanguage = val;
+  localStorage.setItem("jarvis_ui_lang", val);
+
+  if (uiLangSelect && uiLangSelect.value !== val) {
+    uiLangSelect.value = val;
+  }
+  const settingsUiSelect = document.getElementById("settings-ui-lang-select");
+  if (settingsUiSelect && settingsUiSelect.value !== val) {
+    settingsUiSelect.value = val;
+  }
+
+  applyUILanguage(val);
+  setUIState(appState);
+  console.log("UI language changed to:", val);
+}
+
+function applyUILanguage(lang) {
+  const t = UI_TRANSLATIONS[lang] || UI_TRANSLATIONS.en;
+
+  // Header Brand
+  const brandTitle = document.querySelector(".brand-title");
+  if (brandTitle) brandTitle.textContent = t.brandTitle;
+  const brandSub = document.querySelector(".brand-subtitle");
+  if (brandSub) brandSub.textContent = t.brandSubtitle;
+
+  // Nav tabs
+  const tabVoice = document.querySelector("#tab-voice span");
+  if (tabVoice) tabVoice.textContent = t.tabVoice;
+  const tabQuiz = document.querySelector("#tab-quiz span");
+  if (tabQuiz) tabQuiz.textContent = t.tabQuiz;
+  const tabAnalysis = document.querySelector("#tab-analysis span");
+  if (tabAnalysis) tabAnalysis.textContent = t.tabAnalysis;
+  const tabSettings = document.querySelector("#tab-settings span");
+  if (tabSettings) tabSettings.textContent = t.tabSettings;
+
+  // Continuous btn label
+  if (continuousLabel) {
+    continuousLabel.textContent = isContinuousMode ? t.handsFreeOn : t.handsFreeOff;
+  }
+
+  // Footer tip
+  const footerTip = document.querySelector(".footer-tip");
+  if (footerTip) {
+    footerTip.innerHTML = `${t.pressSpace.replace("Space", "<kbd>Space</kbd>")}`;
+  }
+
+  // Quiz View elements
+  const quizTitle = document.querySelector("#view-quiz .quiz-title");
+  if (quizTitle) quizTitle.textContent = t.quizTitle;
+  const quizSub = document.querySelector("#view-quiz .quiz-subtitle");
+  if (quizSub) quizSub.textContent = t.quizSubtitle;
+  const quizFreshBtn = document.querySelector("#view-quiz .btn-refresh-quiz span");
+  if (quizFreshBtn) quizFreshBtn.textContent = t.quizFresh;
+  const quizEmptyTitle = document.querySelector("#quiz-empty h3");
+  if (quizEmptyTitle) quizEmptyTitle.textContent = t.quizEmptyTitle;
+  const quizEmptyDesc = document.querySelector("#quiz-empty p");
+  if (quizEmptyDesc) quizEmptyDesc.textContent = t.quizEmptyDesc;
+  const quizGoConv = document.querySelector("#quiz-empty button");
+  if (quizGoConv) quizGoConv.textContent = t.quizGoConv;
+
+  // Analysis View elements
+  const analysisTitle = document.querySelector("#view-analysis .quiz-title");
+  if (analysisTitle) analysisTitle.textContent = t.analysisTitle;
+  const analysisSub = document.querySelector("#view-analysis .quiz-subtitle");
+  if (analysisSub) analysisSub.textContent = t.analysisSubtitle;
+
+  // Settings labels
+  const settingsTitle = document.querySelector("#view-settings .quiz-title");
+  if (settingsTitle) settingsTitle.textContent = t.settingsTitle;
+  const settingsSub = document.querySelector("#view-settings .quiz-subtitle");
+  if (settingsSub) settingsSub.textContent = t.settingsSubtitle;
+  const lblLang = document.getElementById("lbl-settings-lang");
+  if (lblLang) lblLang.textContent = t.lblPracticeLang;
+  const lblVoice = document.getElementById("lbl-settings-voice");
+  if (lblVoice) lblVoice.textContent = t.lblVoice;
+  const lblScenario = document.getElementById("lbl-settings-scenario");
+  if (lblScenario) lblScenario.textContent = t.lblScenario;
+  const lblUiLang = document.getElementById("lbl-settings-ui-lang");
+  if (lblUiLang) lblUiLang.textContent = t.lblUILang;
+  const btnTestVoice = document.querySelector("#btn-test-voice span");
+  if (btnTestVoice) btnTestVoice.textContent = t.btnTestVoice;
+  const tipVoice = document.querySelector(".settings-tip-text");
+  if (tipVoice) tipVoice.textContent = t.testVoiceTip;
+  const clearHeading = document.querySelector(".danger-heading");
+  if (clearHeading) clearHeading.textContent = t.clearHistoryHeading;
+  const clearDesc = document.querySelector(".danger-explanation");
+  if (clearDesc) clearDesc.textContent = t.clearHistoryDesc;
+  const btnClear = document.querySelector("#btn-reset-data span");
+  if (btnClear) btnClear.textContent = t.btnClearHistory;
+
+  // Scenarios dropdown options
+  const updateScenarioOptions = (sel) => {
+    if (!sel) return;
+    const curVal = sel.value;
+    sel.innerHTML = `
+      <option value="casual">${t.scenarioCasual}</option>
+      <option value="interview">${t.scenarioInterview}</option>
+      <option value="tech">${t.scenarioTech}</option>
+      <option value="travel">${t.scenarioTravel}</option>
+      <option value="grammar">${t.scenarioGrammar}</option>
+    `;
+    sel.value = curVal;
+  };
+  updateScenarioOptions(scenarioSelect);
+  updateScenarioOptions(document.getElementById("settings-scenario-select"));
+}
+
+function syncLanguageFromSettings(val) {
+  changeLanguage(val);
+}
+
+function syncUILangFromSettings(val) {
+  changeUILanguage(val);
 }
 
 function quickSend(text) {
@@ -929,6 +1433,7 @@ async function loadSettings(force = false) {
 
   if (settingsVoiceSelect) settingsVoiceSelect.value = currentVoice;
   if (settingsScenarioSelect) settingsScenarioSelect.value = currentScenario;
+  if (ttsVoiceEl) ttsVoiceEl.textContent = `Voice: ${currentVoice} (audio/mpeg MP3)`;
 
   if (settingsHealthData && !force) return;
 
@@ -981,21 +1486,36 @@ function syncScenarioFromSettings(val) {
 let testVoiceAudio = null;
 async function testCurrentVoice() {
   const btn = document.getElementById("btn-test-voice");
-  if (btn) btn.disabled = true;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<svg class="spinner-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9" stroke-dasharray="28" stroke-dashoffset="10"/></svg><span>Testing Voice Output...</span>`;
+  }
+
+  const resetBtn = () => {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg><span>Test Neural Voice Output</span>`;
+    }
+  };
 
   try {
     if (testVoiceAudio) {
       testVoiceAudio.pause();
       testVoiceAudio = null;
     }
-    const sampleText = encodeURIComponent("Hello Jonathan! Your neural voice output is functioning smoothly on the RTX 5090.");
+    const testPhrase = LANG_DATA[currentLanguage]?.voiceTest || "Hello Jonathan! Your neural voice output is functioning smoothly on the RTX 5090.";
+    const sampleText = encodeURIComponent(testPhrase);
     const url = `/api/tts?text=${sampleText}&voice=${encodeURIComponent(currentVoice)}`;
     testVoiceAudio = new Audio(url);
+    testVoiceAudio.onended = resetBtn;
+    testVoiceAudio.onerror = (e) => {
+      console.error("Voice test playback failed:", e);
+      resetBtn();
+    };
     await testVoiceAudio.play();
   } catch (e) {
     console.error("Voice test failed:", e);
-  } finally {
-    if (btn) btn.disabled = false;
+    resetBtn();
   }
 }
 
@@ -1026,9 +1546,34 @@ async function resetAllContextData() {
       quizBadge.style.display = "none";
     }
 
-    userTranscript.textContent = "Context cleared! Tap the orb to start a fresh conversation.";
-    userTranscript.classList.remove("empty");
-    coachResponse.textContent = "All conversation context and history have been reset. What would you like to talk about?";
+    // Reset Quiz DOM
+    const quizCards = document.getElementById("quiz-cards");
+    if (quizCards) quizCards.innerHTML = "";
+    const quizEmpty = document.getElementById("quiz-empty");
+    if (quizEmpty) quizEmpty.style.display = "none";
+    const quizLoading = document.getElementById("quiz-loading");
+    if (quizLoading) quizLoading.style.display = "none";
+
+    // Reset Analysis DOM
+    const topicTbody = document.getElementById("topic-freq-tbody");
+    if (topicTbody) topicTbody.innerHTML = `<tr><td colspan="5" class="table-empty">No grammar mistakes recorded.</td></tr>`;
+    const recurringList = document.getElementById("recurring-list");
+    if (recurringList) recurringList.innerHTML = `<div class="table-empty">No recurring slips detected.</div>`;
+    const kpiAcc = document.getElementById("kpi-accuracy");
+    if (kpiAcc) kpiAcc.textContent = "--%";
+    const kpiTurns = document.getElementById("kpi-turns");
+    if (kpiTurns) kpiTurns.textContent = "0";
+    const kpiErrors = document.getElementById("kpi-errors");
+    if (kpiErrors) kpiErrors.textContent = "0";
+    const aiSummary = document.getElementById("ai-summary");
+    if (aiSummary) aiSummary.textContent = "Analyzing your speech history...";
+    const aiFocus = document.getElementById("ai-focus-areas");
+    if (aiFocus) aiFocus.innerHTML = "";
+
+    const curInfo = LANG_DATA[currentLanguage] || LANG_DATA.en;
+    userTranscript.textContent = curInfo.emptyTranscript;
+    userTranscript.classList.add("empty");
+    coachResponse.textContent = `"${curInfo.greeting}"`;
     feedbackBanner.classList.add("empty");
     feedbackActions.style.display = "none";
     setUIState("idle");
@@ -1057,6 +1602,11 @@ window.addEventListener("keydown", (e) => {
 
 window.addEventListener("DOMContentLoaded", () => {
   console.log("Language Coach ready.");
+  applyUILanguage(uiLanguage);
+  changeLanguage(currentLanguage, false);
+  if (uiLangSelect) uiLangSelect.value = uiLanguage;
+  const settingsUiSelect = document.getElementById("settings-ui-lang-select");
+  if (settingsUiSelect) settingsUiSelect.value = uiLanguage;
   // Pre-fetch health in background for settings tab
   loadSettings(false);
 });
