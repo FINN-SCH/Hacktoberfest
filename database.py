@@ -264,7 +264,14 @@ def get_analysis_data(session_id: Optional[str] = None) -> Dict[str, Any]:
         "progress_sessions": progress_sessions
     }
 
-def get_stats(session_id: Optional[str] = None) -> Dict[str, Any]:
-    return get_analysis_data(session_id)
+def clear_all_data():
+    conn = get_connection()
+    with conn:
+        conn.execute("DELETE FROM quiz_attempts")
+        conn.execute("DELETE FROM mistakes")
+        conn.execute("DELETE FROM turns")
+        conn.execute("DELETE FROM written_analyses")
+        conn.execute("DELETE FROM sessions")
+    conn.close()
 
 init_db()

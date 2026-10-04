@@ -163,7 +163,37 @@ async def health():
         "status": "online",
         "service": "Voice Language Tutor & Coach",
         "voice": DEFAULT_VOICE,
-        "model": MODEL_NAME
+        "model": MODEL_NAME,
+        "pipeline": {
+            "stt": {
+                "engine": "Faster-Whisper (CTranslate2)",
+                "model": "large-v3-turbo",
+                "device": "CUDA (RTX 5090)",
+                "compute_type": "int8_float16"
+            },
+            "llm": {
+                "model": MODEL_NAME,
+                "server": "LiteLLM / SGLang (local port 30050/4000)",
+                "api_base": LITELLM_URL
+            },
+            "tts": {
+                "engine": "Edge-TTS Neural Streaming",
+                "default_voice": DEFAULT_VOICE,
+                "format": "audio/mpeg (MP3)"
+            },
+            "database": {
+                "engine": "SQLite3 (Embedded)",
+                "tables": ["sessions", "turns", "mistakes", "quiz_attempts", "written_analyses"]
+            }
+        }
+    }
+
+@app.post("/api/reset")
+async def reset_data_endpoint():
+    database.clear_all_data()
+    return {
+        "status": "ok",
+        "message": "All session turns, conversation history, mistakes, quiz attempts, and analysis data have been cleared."
     }
 
 @app.post("/api/sessions/start")

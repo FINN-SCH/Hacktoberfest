@@ -892,9 +892,76 @@ function renderAnalysis(data) {
   }
 }
 
+// Settings Modal & Context Reset
+function openSettingsModal() {
+  const modal = document.getElementById("settings-modal");
+  if (modal) {
+    modal.style.display = "flex";
+  }
+}
+
+function closeSettingsModal() {
+  const modal = document.getElementById("settings-modal");
+  if (modal) {
+    modal.style.display = "none";
+  }
+}
+
+function handleModalBackdropClick(event) {
+  if (event.target && event.target.id === "settings-modal") {
+    closeSettingsModal();
+  }
+}
+
+async function resetAllContextData() {
+  const confirmed = confirm("Are you sure you want to clear all conversation turns, mistakes, quiz history, and analysis data? This action cannot be undone.");
+  if (!confirmed) return;
+
+  const btn = document.getElementById("btn-reset-data");
+  if (btn) btn.textContent = "Clearing...";
+
+  try {
+    const res = await fetch("/api/reset", { method: "POST" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    
+    // Reset local state
+    conversationHistory = [];
+    isSessionStarted = false;
+    currentSessionId = "session_" + Date.now();
+    lastMistakeId = null;
+    quizQuestions = [];
+    analysisData = null;
+
+    if (quizBadge) {
+      quizBadge.textContent = "0";
+      quizBadge.style.display = "none";
+    }
+
+    userTranscript.textContent = "Context cleared! Tap the orb to start a fresh conversation.";
+    userTranscript.classList.remove("empty");
+    coachResponse.textContent = "All conversation context and history have been reset. What would you like to talk about?";
+    feedbackBanner.classList.add("empty");
+    feedbackActions.style.display = "none";
+    setUIState("idle");
+
+    closeSettingsModal();
+    alert("Context and history have been successfully cleared!");
+  } catch (err) {
+    console.error("Reset error:", err);
+    alert("Error resetting data: " + err.message);
+  } finally {
+    if (btn) btn.textContent = "🗑️ Clear All Context";
+  }
+}
+
 // Spacebar Key listener
 window.addEventListener("keydown", (e) => {
+  if (e.code === "Escape") {
+    closeSettingsModal();
+  }
   if (e.code === "Space" && e.target !== textInput) {
+    const modal = document.getElementById("settings-modal");
+    if (modal && modal.style.display !== "none") return;
     e.preventDefault();
     handleOrbClick();
   }
