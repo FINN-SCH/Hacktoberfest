@@ -158,7 +158,7 @@ async def speech_to_text(request: Request):
         raise HTTPException(status_code=400, detail="Audio payload required")
 
     proc = await asyncio.create_subprocess_exec(
-        "ffmpeg", "-threads", "2", "-i", "pipe:0", "-f", "wav", "-ar", "16000", "-ac", "1", "pipe:1",
+        "ffmpeg", "-threads", "4", "-i", "pipe:0", "-f", "wav", "-ar", "16000", "-ac", "1", "pipe:1",
         stdin=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.DEVNULL
@@ -177,9 +177,11 @@ async def speech_to_text(request: Request):
                 language="en",
                 initial_prompt="Verbatim phonetic transcript of an ESL language learner. Transcribe every mistake, grammatical error, slip of the tongue, and exact word spoken without auto-correcting grammar or translating: mein name are Jonathan, he have, yesterday I go, she don't knows.",
                 beam_size=1,
+                best_of=1,
+                temperature=0.0,
                 condition_on_previous_text=False,
                 vad_filter=True,
-                vad_parameters=dict(min_silence_duration_ms=350)
+                vad_parameters=dict(min_silence_duration_ms=250, threshold=0.4)
             )
             return " ".join([s.text for s in segments]).strip()
 
@@ -214,8 +216,8 @@ async def chat_endpoint(req: ChatRequest):
     payload = {
         "model": MODEL_NAME,
         "messages": messages,
-        "temperature": 0.3,
-        "max_tokens": 300,
+        "temperature": 0.25,
+        "max_tokens": 220,
         "stream": True,
         "extra_body": {
             "chat_template_kwargs": {"enable_thinking": False}

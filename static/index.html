@@ -6,49 +6,57 @@
   <title>Voice Language Coach • Live Conversation & Personalized Practice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css?v=5">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css?v=6">
 </head>
 <body>
-  <!-- Header -->
+  <!-- Header Bar -->
   <header class="header">
     <div class="brand-wrap">
-      <div class="brand-icon">EN</div>
+      <div class="brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+      </div>
       <div>
-        <h1 class="brand-title">English Voice Coach</h1>
-        <div class="brand-subtitle">Interactive Spoken Practice & Live Grammar Correction</div>
+        <h1 class="brand-title">Language Coach</h1>
+        <div class="brand-subtitle">Spoken Practice & Real-Time Corrections</div>
       </div>
     </div>
 
-    <!-- Navigation Tabs: Voice Chat vs Quiz Practice -->
-    <div class="nav-tabs">
-      <button type="button" class="nav-tab active" id="tab-voice" onclick="switchView('voice')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-        <span>🎙️ Voice Chat</span>
+    <!-- Center Segmented View Switcher -->
+    <nav class="nav-segment">
+      <button type="button" class="nav-segment-btn active" id="tab-voice" onclick="switchView('voice')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+        <span>Conversation</span>
       </button>
-      <button type="button" class="nav-tab" id="tab-quiz" onclick="switchView('quiz')">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        <span>📝 Practice Quiz</span>
+      <button type="button" class="nav-segment-btn" id="tab-quiz" onclick="switchView('quiz')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Practice Quiz</span>
+        <span class="quiz-count-pill" id="quiz-badge" style="display:none;">0</span>
       </button>
-    </div>
+    </nav>
 
+    <!-- Header Right Controls -->
     <div class="header-controls">
-      <!-- Scenario Selector -->
-      <select id="scenario-select" class="select-pill" onchange="changeScenario(this.value)">
-        <option value="casual">☕ Casual Coffee Chat</option>
-        <option value="interview">💼 Job Interview Practice</option>
-        <option value="tech">💻 Tech & Software Discussion</option>
-        <option value="travel">✈️ Travel & Daily Life</option>
-        <option value="grammar">📚 Strict Grammar Drill</option>
-      </select>
+      <div class="control-pill-group">
+        <select id="scenario-select" class="select-pill" onchange="changeScenario(this.value)">
+          <option value="casual">☕ Casual Chat</option>
+          <option value="interview">💼 Job Interview</option>
+          <option value="tech">💻 Tech & Code</option>
+          <option value="travel">✈️ Travel & Life</option>
+          <option value="grammar">📚 Strict Drill</option>
+        </select>
 
-      <!-- Voice Accent Selector -->
-      <select id="voice-select" class="select-pill" onchange="changeVoice(this.value)">
-        <option value="en-US-AndrewNeural">🇺🇸 Andrew (US Natural)</option>
-        <option value="en-US-AvaNeural">🇺🇸 Ava (US Warm)</option>
-        <option value="en-GB-RyanNeural">🇬🇧 Ryan (UK British)</option>
-        <option value="en-GB-SoniaNeural">🇬🇧 Sonia (UK Gentle)</option>
-      </select>
+        <select id="voice-select" class="select-pill" onchange="changeVoice(this.value)">
+          <option value="en-US-AndrewNeural">🇺🇸 Andrew (US)</option>
+          <option value="en-US-AvaNeural">🇺🇸 Ava (US)</option>
+          <option value="en-GB-RyanNeural">🇬🇧 Ryan (UK)</option>
+          <option value="en-GB-SoniaNeural">🇬🇧 Sonia (UK)</option>
+        </select>
+      </div>
 
       <div class="status-badge" id="status-badge">
         <span class="status-dot" id="status-dot"></span>
@@ -57,16 +65,17 @@
     </div>
   </header>
 
-  <!-- Main Stage -->
+  <!-- Main Container -->
   <main class="container">
     
-    <!-- VOICE CONVERSATION VIEW -->
+    <!-- CONVERSATION VIEW -->
     <div id="view-voice" class="view-panel">
-      <!-- Tutor Interactive Orb -->
-      <div class="tutor-orb-section">
-        <div class="orb-wrapper" id="orb-wrapper" onclick="handleOrbClick()" title="Click or press Space to Speak">
-          <div class="orb-glow"></div>
-          <button type="button" class="orb-btn" id="orb-btn">
+      
+      <!-- Interactive Central Hero Orb -->
+      <section class="orb-stage">
+        <div class="orb-wrapper" id="orb-wrapper" onclick="handleOrbClick()" title="Click or press Spacebar to talk">
+          <div class="orb-aura"></div>
+          <button type="button" class="orb-btn" id="orb-btn" aria-label="Microphone">
             <svg class="orb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
               <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
@@ -76,71 +85,73 @@
           </button>
         </div>
 
-        <!-- Realtime Audio Waveform -->
-        <canvas class="visualizer-canvas" id="visualizer" width="640" height="84"></canvas>
-      </div>
+        <!-- Sleek audio reactive visualizer -->
+        <canvas class="visualizer-canvas" id="visualizer" width="480" height="40"></canvas>
+      </section>
 
-      <!-- Coach Dialogue & Feedback Card -->
-      <div class="coach-card">
-        <!-- User speech -->
-        <div class="turn-box">
-          <div class="turn-header">
-            <span class="turn-tag user">What You Said</span>
+      <!-- Active Conversation Card -->
+      <section class="coach-card">
+        <!-- User transcript block -->
+        <div class="turn-row">
+          <div class="turn-meta">
+            <span class="turn-tag user">You</span>
           </div>
-          <div class="turn-content empty" id="user-transcript">
-            Press the microphone button or spacebar and say anything in English...
+          <div class="turn-text empty" id="user-transcript">
+            Tap the orb or press Spacebar to start speaking...
           </div>
         </div>
 
-        <!-- Live Grammar & Phrasing Feedback -->
-        <div class="feedback-banner empty" id="feedback-banner">
-          <div class="feedback-header">
-            <div class="feedback-icon" id="feedback-icon">💡</div>
-            <div class="feedback-topic-badge" id="feedback-topic-badge"></div>
+        <!-- Live Grammar Feedback Card -->
+        <div class="feedback-card empty" id="feedback-banner">
+          <div class="feedback-top">
+            <div class="feedback-topic" id="feedback-topic-badge">GRAMMAR</div>
             <div class="feedback-actions" id="feedback-actions" style="display:none;">
-              <button type="button" class="btn-sm-action" onclick="dismissMistake('not_a_mistake')">Not a mistake</button>
-              <button type="button" class="btn-sm-action" onclick="dismissMistake('misheard')">Misheard</button>
+              <button type="button" class="action-chip dismiss" onclick="dismissMistake('not_a_mistake')">Not a mistake</button>
+              <button type="button" class="action-chip" onclick="dismissMistake('misheard')">Misheard</button>
             </div>
           </div>
-          <div class="feedback-text" id="feedback-text"></div>
-        </div>
-
-        <!-- Tutor Response -->
-        <div class="turn-box">
-          <div class="turn-header">
-            <span class="turn-tag coach">Tutor Response</span>
-          </div>
-          <div class="turn-content" id="coach-response">
-            "Hello Jonathan! I'm your English conversation coach. Speak with me about anything you like, and I'll gently correct any mistakes along the way. What would you like to talk about today?"
+          <div class="feedback-body">
+            <span class="feedback-icon" id="feedback-icon">💡</span>
+            <div class="feedback-text" id="feedback-text"></div>
           </div>
         </div>
-      </div>
 
-      <!-- Quick Topic Starters -->
+        <!-- Coach speech block -->
+        <div class="turn-row coach-row">
+          <div class="turn-meta">
+            <span class="turn-tag coach">Coach</span>
+          </div>
+          <div class="turn-text" id="coach-response">
+            "Hello Jonathan! I'm your English conversation coach. Tell me anything you like, and I will correct any mistakes as we talk."
+          </div>
+        </div>
+      </section>
+
+      <!-- Topic Starters -->
       <div class="topic-chips">
-        <button type="button" class="topic-chip" onclick="quickSend('Hi! Can you help me practice for a tech job interview?')">💼 Practice Job Interview</button>
-        <button type="button" class="topic-chip" onclick="quickSend('Yesterday I go to the supermarket and buyed some apples.')">🔍 Test Grammar Correction</button>
-        <button type="button" class="topic-chip" onclick="quickSend('What are your top three tips for improving my English fluency?')">🗣️ Tips for Fluency</button>
-        <button type="button" class="topic-chip" onclick="quickSend('Let us have a debate about artificial intelligence.')">🤖 Debate on AI</button>
+        <button type="button" class="topic-chip" onclick="quickSend('Hi! Can you help me practice for a tech job interview?')">💼 Job Interview</button>
+        <button type="button" class="topic-chip" onclick="quickSend('Yesterday I go to the supermarket and buyed some apples.')">🔍 Test Correction</button>
+        <button type="button" class="topic-chip" onclick="quickSend('What are your top three tips for improving my English fluency?')">🗣️ Fluency Tips</button>
+        <button type="button" class="topic-chip" onclick="quickSend('Let us have a debate about artificial intelligence.')">🤖 Debate AI</button>
       </div>
 
-      <!-- Bottom Controls Bar -->
+      <!-- Action Bar -->
       <div class="controls-bar">
         <button type="button" class="continuous-btn" id="continuous-btn" onclick="toggleContinuousMode()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span class="pulse-indicator"></span>
           <span id="continuous-label">Hands-Free: OFF</span>
         </button>
 
-        <form class="input-group" onsubmit="handleFormSubmit(event)">
+        <form class="input-form" onsubmit="handleFormSubmit(event)">
           <input type="text" class="text-input" id="text-input" placeholder="Type a sentence in English to check grammar or chat..." autocomplete="off">
-          <button type="submit" class="submit-btn" aria-label="Send">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <button type="submit" class="send-btn" aria-label="Send message">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </form>
       </div>
 
       <div class="footer-tip">
-        Press <kbd style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-family:monospace;">Spacebar</kbd> anytime to start or stop speaking • Audio powered by Faster-Whisper & Neural TTS
+        Press <kbd>Space</kbd> to talk • Low-latency Faster-Whisper & SGLang streaming
       </div>
     </div>
 
@@ -149,10 +160,13 @@
       <div class="quiz-container">
         <div class="quiz-header-banner">
           <div>
-            <h2 class="quiz-title">Personalized Practice Quiz</h2>
-            <p class="quiz-subtitle">Questions generated directly from your actual conversation mistakes.</p>
+            <h2 class="quiz-title">Practice Your Weaknesses</h2>
+            <p class="quiz-subtitle">Targeted quiz questions generated strictly from your real conversation mistakes.</p>
           </div>
-          <button type="button" class="btn-refresh-quiz" onclick="loadQuiz(true)">🔄 Fresh Questions</button>
+          <button type="button" class="btn-refresh-quiz" onclick="loadQuiz(true)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span>Fresh Questions</span>
+          </button>
         </div>
 
         <div id="quiz-loading" class="quiz-status-msg" style="display:none;">
@@ -160,10 +174,10 @@
         </div>
 
         <div id="quiz-empty" class="quiz-status-msg" style="display:none;">
-          <div style="font-size: 32px; margin-bottom: 8px;">🎉</div>
-          <h3>No mistakes recorded yet!</h3>
-          <p>Switch to Voice Chat, have a conversation, and any grammar or vocabulary slip will automatically generate tailored practice questions here.</p>
-          <button type="button" class="btn-action-primary" onclick="switchView('voice')" style="margin-top: 14px;">Go to Voice Chat</button>
+          <div class="empty-icon">✨</div>
+          <h3>No active mistakes yet</h3>
+          <p>Talk in Conversation mode. Any grammar or vocabulary slip will automatically turn into a personalized practice quiz here.</p>
+          <button type="button" class="btn-action-primary" onclick="switchView('voice')">Go to Conversation</button>
         </div>
 
         <div id="quiz-cards" class="quiz-cards-grid"></div>
@@ -172,6 +186,6 @@
 
   </main>
 
-  <script src="/static/app.js?v=5"></script>
+  <script src="/static/app.js?v=6"></script>
 </body>
 </html>

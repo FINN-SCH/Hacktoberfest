@@ -1,4 +1,4 @@
-/* English Voice Language Coach & Quiz Tutor - Frontend Application */
+/* English Voice Language Coach & Quiz Tutor - Optimized Frontend Application */
 
 // State
 let appState = "idle"; // "idle" | "listening" | "thinking" | "speaking"
@@ -16,17 +16,17 @@ let analyser = null;
 let dataArray = null;
 let animFrameId = null;
 
-// Speech Audio Queue
+// Audio Queue & Preloader
 let audioQueue = [];
 let isAudioPlaying = false;
 let currentPlayingAudio = null;
 let conversationHistory = [];
 
-// Silence detection (VAD)
+// Low-latency Silence detection (VAD)
 let silenceStartTime = null;
 let speechDetected = false;
-const SILENCE_TIMEOUT_MS = 1400;
-const VAD_VOLUME_THRESHOLD = 0.035;
+const SILENCE_TIMEOUT_MS = 950; // Snappy turn cut-off
+const VAD_VOLUME_THRESHOLD = 0.030;
 
 // DOM Elements
 const orbWrapper = document.getElementById("orb-wrapper");
@@ -47,6 +47,7 @@ const continuousLabel = document.getElementById("continuous-label");
 const textInput = document.getElementById("text-input");
 const scenarioSelect = document.getElementById("scenario-select");
 const voiceSelect = document.getElementById("voice-select");
+const quizBadge = document.getElementById("quiz-badge");
 
 // Navigation View Tabs
 function switchView(viewName) {
@@ -80,19 +81,19 @@ function playChime(kind) {
 
     const now = ctx.currentTime;
     if (kind === "start") {
-      osc.frequency.setValueAtTime(523.25, now); // C5
-      osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.12); // E5
-      gain.gain.setValueAtTime(0.06, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      osc.frequency.setValueAtTime(523.25, now);
+      osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.10);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
       osc.start(now);
-      osc.stop(now + 0.18);
+      osc.stop(now + 0.15);
     } else if (kind === "stop") {
       osc.frequency.setValueAtTime(659.25, now);
-      osc.frequency.exponentialRampToValueAtTime(440, now + 0.12);
-      gain.gain.setValueAtTime(0.06, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      osc.frequency.exponentialRampToValueAtTime(440, now + 0.10);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
       osc.start(now);
-      osc.stop(now + 0.18);
+      osc.stop(now + 0.15);
     }
   } catch (e) {}
 }
@@ -110,10 +111,10 @@ function setUIState(newState) {
     orbLabel.textContent = "LISTENING...";
     statusText.textContent = "LISTENING";
   } else if (newState === "thinking") {
-    orbLabel.textContent = "ANALYSING...";
+    orbLabel.textContent = "THINKING...";
     statusText.textContent = "COACH THINKING";
   } else if (newState === "speaking") {
-    orbLabel.textContent = "TUTOR SPEAKING";
+    orbLabel.textContent = "SPEAKING...";
     statusText.textContent = "SPEAKING";
   }
 }
@@ -194,7 +195,7 @@ async function startRecording() {
       }
     };
 
-    mediaRecorder.start(100);
+    mediaRecorder.start(80);
     setUIState("listening");
     playChime("start");
 
@@ -236,7 +237,7 @@ function monitorContinuousVAD() {
     }
   }
 
-  setTimeout(monitorContinuousVAD, 100);
+  setTimeout(monitorContinuousVAD, 70);
 }
 
 function stopRecordingAndSubmit() {
@@ -282,7 +283,7 @@ async function processAudioTurn(audioBlob) {
     const query = (data.text || "").trim();
 
     if (!query) {
-      userTranscript.textContent = "No clear English speech detected. Please speak again!";
+      userTranscript.textContent = "No speech detected. Please speak again!";
       setUIState("idle");
       checkNextContinuousTurn();
       return;
@@ -298,7 +299,7 @@ async function processAudioTurn(audioBlob) {
   }
 }
 
-// Language Coach Execution & Feedback Parser
+// Language Coach Execution & Low-Latency Streaming
 async function executeCoachTurn(userInput) {
   setUIState("thinking");
   coachResponse.textContent = "...";
@@ -349,13 +350,14 @@ async function executeCoachTurn(userInput) {
             if (parsed.meta.corrections && parsed.meta.corrections.length > 0) {
               lastMistakeId = parsed.meta.corrections[0].id;
               feedbackActions.style.display = "flex";
+              updateQuizBadge(1);
             }
           }
           if (parsed.delta) {
             rawOutput += parsed.delta;
             parseAndRenderCoachOutput(rawOutput);
 
-            // Stream spoken reply chunks into TTS queue
+            // Stream spoken reply chunks into TTS queue immediately
             let spokenPart = "";
             if (rawOutput.includes("SPOKEN:")) {
               spokenPart = rawOutput.split("SPOKEN:")[1] || "";
@@ -364,14 +366,17 @@ async function executeCoachTurn(userInput) {
             if (spokenPart) {
               speechSentenceBuffer += parsed.delta;
 
-              if (/[.!?]\s+$/.test(speechSentenceBuffer) || (speechSentenceBuffer.length > 70 && /[,;]\s+$/.test(speechSentenceBuffer))) {
+              // Dispatch sentence or clause to TTS as early as possible
+              if (/[.!?]\s+$/.test(speechSentenceBuffer) || (speechSentenceBuffer.length > 45 && /[,;]\s+$/.test(speechSentenceBuffer))) {
                 const cleanChunk = speechSentenceBuffer
                   .replace(/CORRECTION:[\s\S]*?SPOKEN:/i, "")
                   .replace(/TOPIC:[\s\S]*?SPOKEN:/i, "")
+                  .replace(/ORIGINAL:[\s\S]*?SPOKEN:/i, "")
+                  .replace(/CORRECTED:[\s\S]*?SPOKEN:/i, "")
                   .replace(/SPOKEN:/i, "")
                   .trim();
                 speechSentenceBuffer = "";
-                if (cleanChunk) {
+                if (cleanChunk && cleanChunk.length > 2) {
                   queueTTS(cleanChunk);
                 }
               }
@@ -386,9 +391,11 @@ async function executeCoachTurn(userInput) {
       const cleanChunk = speechSentenceBuffer
         .replace(/CORRECTION:[\s\S]*?SPOKEN:/i, "")
         .replace(/TOPIC:[\s\S]*?SPOKEN:/i, "")
+        .replace(/ORIGINAL:[\s\S]*?SPOKEN:/i, "")
+        .replace(/CORRECTED:[\s\S]*?SPOKEN:/i, "")
         .replace(/SPOKEN:/i, "")
         .trim();
-      if (cleanChunk) {
+      if (cleanChunk && cleanChunk.length > 2) {
         queueTTS(cleanChunk);
       }
     }
@@ -471,12 +478,78 @@ async function dismissMistake(reason) {
     if (res.ok) {
       feedbackBanner.classList.add("correct");
       feedbackIcon.textContent = "👌";
-      feedbackText.textContent = reason === "misheard" ? "Marked as misheard (removed from your quiz & stats)." : "Marked as not a mistake (dismissed).";
+      feedbackText.textContent = reason === "misheard" ? "Marked as misheard (removed from quiz & stats)." : "Marked as not a mistake (dismissed).";
       feedbackActions.style.display = "none";
       feedbackTopicBadge.textContent = "EXCLUDED";
+      updateQuizBadge(-1);
     }
   } catch (e) {
     console.warn("Exclusion error:", e);
+  }
+}
+
+function updateQuizBadge(delta) {
+  if (!quizBadge) return;
+  let count = parseInt(quizBadge.textContent || "0", 10) + delta;
+  count = Math.max(0, count);
+  quizBadge.textContent = count;
+  quizBadge.style.display = count > 0 ? "inline-block" : "none";
+}
+
+// Low-latency Audio Queue with Preloading
+function queueTTS(sentence) {
+  if (!sentence) return;
+  const audioUrl = `/api/tts?text=${encodeURIComponent(sentence)}&voice=${encodeURIComponent(currentVoice)}`;
+  
+  // Preload audio element right away so fetch happens concurrently
+  const audioEl = new Audio();
+  audioEl.preload = "auto";
+  audioEl.src = audioUrl;
+
+  audioQueue.push({ url: audioUrl, text: sentence, audio: audioEl });
+
+  if (!isAudioPlaying) {
+    playNextAudio();
+  }
+}
+
+async function playNextAudio() {
+  if (audioQueue.length === 0) {
+    isAudioPlaying = false;
+    setUIState("idle");
+    checkNextContinuousTurn();
+    return;
+  }
+
+  isAudioPlaying = true;
+  setUIState("speaking");
+  const item = audioQueue.shift();
+
+  try {
+    currentPlayingAudio = item.audio || new Audio(item.url);
+    currentPlayingAudio.onended = () => {
+      currentPlayingAudio = null;
+      playNextAudio();
+    };
+    currentPlayingAudio.onerror = () => {
+      console.warn("TTS playback error:", item.text);
+      currentPlayingAudio = null;
+      playNextAudio();
+    };
+    await currentPlayingAudio.play();
+  } catch (e) {
+    console.warn("Play error:", e);
+    playNextAudio();
+  }
+}
+
+function checkNextContinuousTurn() {
+  if (isContinuousMode && appState === "idle") {
+    setTimeout(() => {
+      if (isContinuousMode && appState === "idle") {
+        startRecording();
+      }
+    }, 500); // reduced delay for faster hands-free loop
   }
 }
 
@@ -505,6 +578,10 @@ async function loadQuiz(forceRefresh = false) {
     loadingEl.style.display = "none";
 
     quizQuestions = data.questions || [];
+    if (quizBadge) {
+      quizBadge.textContent = quizQuestions.length;
+      quizBadge.style.display = quizQuestions.length > 0 ? "inline-block" : "none";
+    }
     if (quizQuestions.length === 0) {
       emptyEl.style.display = "block";
     } else {
@@ -576,7 +653,6 @@ async function answerQuizQuestion(qIdx, oIdx) {
       clickedBtn.classList.add("correct");
     } else {
       clickedBtn.classList.add("wrong");
-      // Highlight correct button
       buttons.forEach(b => {
         if (b.textContent.trim().toLowerCase() === q.correct_answer.trim().toLowerCase()) {
           b.classList.add("correct");
@@ -595,57 +671,6 @@ async function answerQuizQuestion(qIdx, oIdx) {
 function escapeHtml(text) {
   if (!text) return "";
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-
-// Queue TTS Audio chunks for consecutive seamless playback
-function queueTTS(sentence) {
-  if (!sentence) return;
-  const audioUrl = `/api/tts?text=${encodeURIComponent(sentence)}&voice=${encodeURIComponent(currentVoice)}`;
-  audioQueue.push({ url: audioUrl, text: sentence });
-
-  if (!isAudioPlaying) {
-    playNextAudio();
-  }
-}
-
-async function playNextAudio() {
-  if (audioQueue.length === 0) {
-    isAudioPlaying = false;
-    setUIState("idle");
-    checkNextContinuousTurn();
-    return;
-  }
-
-  isAudioPlaying = true;
-  setUIState("speaking");
-  const item = audioQueue.shift();
-
-  try {
-    currentPlayingAudio = new Audio(item.url);
-    currentPlayingAudio.onended = () => {
-      currentPlayingAudio = null;
-      playNextAudio();
-    };
-    currentPlayingAudio.onerror = () => {
-      console.warn("TTS chunk playback error:", item.text);
-      currentPlayingAudio = null;
-      playNextAudio();
-    };
-    await currentPlayingAudio.play();
-  } catch (e) {
-    console.warn("Play error:", e);
-    playNextAudio();
-  }
-}
-
-function checkNextContinuousTurn() {
-  if (isContinuousMode && appState === "idle") {
-    setTimeout(() => {
-      if (isContinuousMode && appState === "idle") {
-        startRecording();
-      }
-    }, 700);
-  }
 }
 
 // User Actions
@@ -712,5 +737,5 @@ window.addEventListener("keydown", (e) => {
 });
 
 window.addEventListener("DOMContentLoaded", () => {
-  console.log("English Voice Coach & Quiz Tutor ready.");
+  console.log("Language Coach ready.");
 });
