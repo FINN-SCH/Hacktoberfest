@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Talk Assistant</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <section id="homeView" class="view active" aria-label="Startseite">
+        <div class="home-content">
+          <h1>Talk Assistant</h1>
+          <p class="subtitle">Wähle einen Modus, um zu starten</p>
+
+          <div class="mode-grid">
+            <button class="mode-card speak-card" data-target="speakView">
+              <span class="emoji">🎙️</span>
+              <span class="label">Sprechen</span>
+            </button>
+
+            <button class="mode-card analytics-card" data-target="analyticsView">
+              <span class="emoji">📊</span>
+              <span class="label">Analysen</span>
+            </button>
+
+            <button class="mode-card quiz-card" data-target="quizView">
+              <span class="emoji">🧩</span>
+              <span class="label">Quizze</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section id="speakView" class="view" aria-label="Sprachanalyse">
+        <div class="view-header">
+          <button class="back-btn" data-target="homeView">← Zurück</button>
+          <h2>Echtzeit Sprachanalyse</h2>
+        </div>
+
+        <div id="speakChat" class="scroll-panel chat-panel" aria-live="polite"></div>
+
+        <div class="controls-panel">
+          <button id="toggleMic" class="primary-btn mic-btn">🎙️ Aufnahme starten</button>
+          <div id="micStatus" class="status-text">Bereit für Spracheingabe</div>
+        </div>
+      </section>
+
+      <section id="quizView" class="view" aria-label="Quiz">
+        <div class="view-header">
+          <button class="back-btn" data-target="homeView">← Zurück</button>
+          <h2>KI-Quiz &amp; Übungen</h2>
+        </div>
+
+        <div id="quizChat" class="scroll-panel chat-panel" aria-live="polite"></div>
+
+        <div class="input-panel">
+          <input
+            id="quizInput"
+            type="text"
+            placeholder="Schreibe eine Antwort oder frage die KI nach einem Thema..."
+            aria-label="Antwort eingeben"
+          />
+          <button id="sendQuizAnswer" class="primary-btn send-btn">Senden</button>
+        </div>
+      </section>
+
+      <section id="analyticsView" class="view" aria-label="Analysen">
+        <div class="view-header">
+          <button class="back-btn" data-target="homeView">← Zurück</button>
+          <h2>Sprachanalysen &amp; Fortschritt</h2>
+        </div>
+
+        <div class="analytics-scroll">
+          <div class="analytics-section">
+            <h3>📊 Fehlerverteilung nach Kategorien</h3>
+            <div id="categoriesPanel" class="card-panel"></div>
+          </div>
+
+          <div class="analytics-section">
+            <h3>🎯 Schwerpunkte für dein nächstes Training</h3>
+            <div id="recommendationsPanel" class="tips-list"></div>
+          </div>
+
+          <div class="analytics-section">
+            <h3>📝 Häufigste Einzelfehler</h3>
+            <div id="detailsPanel" class="details-list"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
