@@ -11,6 +11,7 @@ class Settings(BaseSettings):
         env_file=BACKEND_DIR / ".env", env_file_encoding="utf-8",
         case_sensitive=False, extra="ignore",
     )
+    host: str = "127.0.0.1"
     port: int = Field(default=5050, ge=1, le=65535)
     db_path: Path = BACKEND_DIR / "tutor.db"
     provider_timeout_s: float = Field(default=60, gt=0, le=300)

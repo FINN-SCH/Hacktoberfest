@@ -5,7 +5,7 @@ from app.main import create_app
 def test_health_and_api_404_without_provider_initialization(tmp_path):
     (tmp_path / "index.html").write_text("<html>Test SPA</html>")
     (tmp_path / "asset.js").write_text("export default 1")
-    app = create_app(Settings(_env_file=None), frontend_dist=tmp_path)
+    app = create_app(Settings(_env_file=None,db_path=tmp_path / "test.db"), frontend_dist=tmp_path)
     with TestClient(app) as client:
         assert client.get("/api/health").json()["status"] == "ok"
         response = client.get("/api/nope")

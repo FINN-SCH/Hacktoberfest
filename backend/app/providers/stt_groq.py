@@ -8,7 +8,7 @@ from .interfaces import Language, TranscriptionResult
 # Deliberately preserve the prototype's learner-error instruction; no phrase blacklist.
 INITIAL_PROMPTS = {
     "en": "Verbatim phonetic transcript of an ESL language learner. Transcribe every mistake, grammatical error, slip of the tongue, and exact word spoken without auto-correcting grammar or translating: mein name are Jonathan, he have, yesterday I go, she don't knows.",
-    "de": "Wortgetreue Transkription eines Deutschlernenden. Jedes gesprochene Wort, jeden Grammatikfehler und Versprecher unveraendert transkribieren. Nicht korrigieren oder uebersetzen: Ich habe nach Berlin gegangen. Er gehen zur Arbeit. Ich sehe der Mann.",
+    "de": "Wortgetreue Transkription eines Deutschlernenden. Jedes gesprochene Wort, jeden Grammatikfehler und Versprecher unverändert transkribieren. Nicht korrigieren oder übersetzen: Ich habe nach Berlin gegangen. Er gehen zur Arbeit. Ich sehe der Mann.",
 }
 
 class GroqSTT:
