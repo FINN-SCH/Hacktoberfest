@@ -17,7 +17,7 @@ export function measureTiming(frames: readonly ClassifiedFrame[]): SpeechTiming 
     span += frames[i].samples;
     if (frames[i].voiced) voiced += frames[i].samples;
   }
-  const speech_span_ms = span * 1000 / SAMPLE_RATE;
-  const voiced_ms = voiced * 1000 / SAMPLE_RATE;
+  const speech_span_ms = Math.round(span * 1000 / SAMPLE_RATE);
+  const voiced_ms = Math.round(voiced * 1000 / SAMPLE_RATE);
   return { speech_span_ms, voiced_ms, pause_ms: speech_span_ms - voiced_ms };
 }

@@ -17,16 +17,791 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Profiles */
+        get: operations["list_profiles_api_profiles_get"];
+        put?: never;
+        /** Create Profile */
+        post: operations["create_profile_api_profiles_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start */
+        post: operations["start_api_sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Session */
+        get: operations["get_session_api_sessions__session_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/profiles/{profile_id}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** History */
+        get: operations["history_api_profiles__profile_id__sessions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/{session_id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** End */
+        post: operations["end_api_sessions__session_id__end_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/{session_id}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Report */
+        get: operations["report_api_sessions__session_id__report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/{session_id}/report/regenerate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Regenerate */
+        post: operations["regenerate_api_sessions__session_id__report_regenerate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/{session_id}/turns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Turns */
+        get: operations["list_turns_api_sessions__session_id__turns_get"];
+        put?: never;
+        /** Submit */
+        post: operations["submit_api_sessions__session_id__turns_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sessions/{session_id}/turns/by-client/{client_turn_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** By Client */
+        get: operations["by_client_api_sessions__session_id__turns_by_client__client_turn_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/turns/{turn_id}/speech": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Speech */
+        post: operations["speech_api_turns__turn_id__speech_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/turns/{turn_id}/misheard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Misheard */
+        post: operations["misheard_api_turns__turn_id__misheard_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/mistakes/{mistake_id}/not-a-mistake": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Not A Mistake */
+        post: operations["not_a_mistake_api_mistakes__mistake_id__not_a_mistake_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/quizzes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create */
+        post: operations["create_api_quizzes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/quizzes/{quiz_id}/attempts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Grade */
+        post: operations["grade_api_quizzes__quiz_id__attempts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/profiles/{profile_id}/analysis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get */
+        get: operations["get_api_profiles__profile_id__analysis_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AnalysisOut */
+        AnalysisOut: {
+            /** Profile Id */
+            profile_id: number;
+            /** Language */
+            language: string;
+            /** Session Count */
+            session_count: number;
+            /** Topic Frequency */
+            topic_frequency: components["schemas"]["TopicFrequency"][];
+            /** Progress */
+            progress: components["schemas"]["SessionHistoryOut"][];
+            /** Recurring */
+            recurring: components["schemas"]["RecurringTopic"][];
+            /** Improving */
+            improving: components["schemas"]["ImprovingTopic"][];
+            written: components["schemas"]["WrittenAnalysis"] | null;
+            /** Based On Sessions */
+            based_on_sessions: number | null;
+            /** Generated At */
+            generated_at: string | null;
+            /** Stale Exclusions */
+            stale_exclusions: number;
+            /** Latest Attempt Failed */
+            latest_attempt_failed: boolean;
+        };
+        /** Body_submit_api_sessions__session_id__turns_post */
+        Body_submit_api_sessions__session_id__turns_post: {
+            /** Client Turn Id */
+            client_turn_id: string;
+            /** Speech Span Ms */
+            speech_span_ms: number;
+            /** Voiced Ms */
+            voiced_ms: number;
+            /** Pause Ms */
+            pause_ms: number;
+            /** Audio */
+            audio?: string | null;
+        };
+        /** CorrectionOut */
+        CorrectionOut: {
+            /** Id */
+            id: number;
+            /** Original */
+            original: string;
+            /** Corrected */
+            corrected: string;
+            /** Corrected Sentence */
+            corrected_sentence: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "error" | "improvement";
+            /** Topic */
+            topic: string;
+            /** Topic Label */
+            topic_label: string;
+            /** Explanation */
+            explanation: string;
+            /** Highlight Start */
+            highlight_start: number | null;
+            /** Highlight End */
+            highlight_end: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "excluded";
+        };
+        /** ErrorBody */
+        ErrorBody: {
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+            /** Stage */
+            stage?: ("stt" | "analysis" | "tts" | "request") | null;
+            /**
+             * Retryable
+             * @default false
+             */
+            retryable: boolean;
+            /** Turn Id */
+            turn_id?: number | null;
+        };
+        /** ErrorEnvelope */
+        ErrorEnvelope: {
+            error: components["schemas"]["ErrorBody"];
+        };
+        /** EvidenceQuote */
+        EvidenceQuote: {
+            /** Turn Id */
+            turn_id: number;
+            /** Quote */
+            quote: string;
+            /** Explanation */
+            explanation: string;
+        };
+        /** FluencyScore */
+        FluencyScore: {
+            /** Rating */
+            rating: number | null;
+            /** Wpm */
+            wpm: number | null;
+            /** Pause Ratio */
+            pause_ratio: number | null;
+            /** Heuristic Version */
+            heuristic_version: string;
+        };
+        /** FocusArea */
+        FocusArea: {
+            /** Topic */
+            topic: string;
+            /** Why */
+            why: string;
+            /** Tip */
+            tip: string;
+            /** Example Mistake Ids */
+            example_mistake_ids: number[];
+        };
+        /** GrammarScore */
+        GrammarScore: {
+            /** Rating */
+            rating: number | null;
+            /** Error Free Turn Pct */
+            error_free_turn_pct: number | null;
+            /** Errors Per 100 Words */
+            errors_per_100_words: number | null;
+            /** Error Count */
+            error_count: number;
+            /** Eligible Turns */
+            eligible_turns: number;
+        };
         /** HealthResponse */
         HealthResponse: {
             /** Status */
             status: string;
             /** Service */
             service: string;
+        };
+        /** ImprovingTopic */
+        ImprovingTopic: {
+            /** Topic */
+            topic: string;
+            /** Label */
+            label: string;
+        };
+        /** Option */
+        Option: {
+            /** Id */
+            id: string;
+            /** Text */
+            text: string;
+        };
+        /** ProfileCreate */
+        ProfileCreate: {
+            /** Name */
+            name: string;
+            /** Native Language */
+            native_language: string;
+            /**
+             * Default Explanation Mode
+             * @default native
+             * @enum {string}
+             */
+            default_explanation_mode: "native" | "target";
+        };
+        /** ProfileOut */
+        ProfileOut: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Native Language */
+            native_language: string;
+            /**
+             * Default Explanation Mode
+             * @enum {string}
+             */
+            default_explanation_mode: "native" | "target";
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** QuestionResult */
+        QuestionResult: {
+            /** Id */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "correct" | "wrong" | "skipped_source_excluded";
+            /** Correct Answer */
+            correct_answer: string | null;
+            /** Explanation */
+            explanation: string;
+            /** Source Original */
+            source_original: string;
+            /** Source Corrected */
+            source_corrected: string;
+        };
+        /** QuizAnswers */
+        QuizAnswers: {
+            /** Answers */
+            answers: {
+                [key: string]: string;
+            };
+        };
+        /** QuizAttemptOut */
+        QuizAttemptOut: {
+            /** Id */
+            id: number;
+            /** Quiz Id */
+            quiz_id: number;
+            /** Correct */
+            correct: number;
+            /** Total */
+            total: number;
+            /** Results */
+            results: components["schemas"]["QuestionResult"][];
+        };
+        /** QuizCreate */
+        QuizCreate: {
+            /** Profile Id */
+            profile_id: number;
+            /**
+             * Language
+             * @enum {string}
+             */
+            language: "de" | "en";
+        };
+        /** QuizOut */
+        QuizOut: {
+            /** Id */
+            id: number;
+            /** Profile Id */
+            profile_id: number;
+            /**
+             * Language
+             * @enum {string}
+             */
+            language: "de" | "en";
+            /** Questions */
+            questions: components["schemas"]["QuizQuestionOut"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** QuizQuestionOut */
+        QuizQuestionOut: {
+            /** Id */
+            id: string;
+            /** Source Mistake Id */
+            source_mistake_id: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "mc" | "fill_in";
+            /** Question */
+            question: string;
+            /** Options */
+            options: components["schemas"]["Option"][];
+            /** Source Original */
+            source_original: string;
+            /** Source Corrected */
+            source_corrected: string;
+        };
+        /** RecurringExample */
+        RecurringExample: {
+            /** Original */
+            original: string;
+            /** Corrected */
+            corrected: string;
+            /** Count */
+            count: number;
+        };
+        /** RecurringTopic */
+        RecurringTopic: {
+            /** Topic */
+            topic: string;
+            /** Label */
+            label: string;
+            /** Sessions */
+            sessions: number;
+            /** Errors */
+            errors: number;
+            /** Examples */
+            examples: components["schemas"]["RecurringExample"][];
+        };
+        /** ReportOut */
+        ReportOut: {
+            session: components["schemas"]["SessionOut"];
+            /** Transcript */
+            transcript: components["schemas"]["TurnOut"][];
+            scores: components["schemas"]["SessionScores"];
+            /** Snapshot Status */
+            snapshot_status: string;
+            /** Vocab Rating */
+            vocab_rating: number | null;
+            /** Vocab Evidence */
+            vocab_evidence: components["schemas"]["EvidenceQuote"][];
+            summary: components["schemas"]["ReportSummary"] | null;
+            /** Snapshot Generated At */
+            snapshot_generated_at: string | null;
+            /** Stale Exclusions */
+            stale_exclusions: number;
+        };
+        /** ReportSummary */
+        ReportSummary: {
+            /** Weaknesses */
+            weaknesses: string[];
+            /** Next Focus */
+            next_focus: string;
+        };
+        /** SessionCreate */
+        SessionCreate: {
+            /** Profile Id */
+            profile_id: number;
+            /**
+             * Target Language
+             * @enum {string}
+             */
+            target_language: "de" | "en";
+            /**
+             * Explanation Mode
+             * @enum {string}
+             */
+            explanation_mode: "native" | "target";
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "A1" | "A2" | "B1" | "B2";
+            /**
+             * Scenario
+             * @enum {string}
+             */
+            scenario: "cafe" | "job_interview" | "doctor" | "free_talk";
+        };
+        /** SessionHistoryOut */
+        SessionHistoryOut: {
+            /** Id */
+            id: number;
+            /** Profile Id */
+            profile_id: number;
+            /**
+             * Target Language
+             * @enum {string}
+             */
+            target_language: "de" | "en";
+            /** Explanation Language */
+            explanation_language: string;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "A1" | "A2" | "B1" | "B2";
+            /**
+             * Scenario
+             * @enum {string}
+             */
+            scenario: "cafe" | "job_interview" | "doctor" | "free_talk";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "finalizing" | "ended";
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Ended At */
+            ended_at: string | null;
+            /** Is Demo Data */
+            is_demo_data: boolean;
+            scores: components["schemas"]["SessionScores"];
+            /** Vocab Rating */
+            vocab_rating: number | null;
+            /** Stale Exclusions */
+            stale_exclusions: number;
+        };
+        /** SessionOut */
+        SessionOut: {
+            /** Id */
+            id: number;
+            /** Profile Id */
+            profile_id: number;
+            /**
+             * Target Language
+             * @enum {string}
+             */
+            target_language: "de" | "en";
+            /** Explanation Language */
+            explanation_language: string;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "A1" | "A2" | "B1" | "B2";
+            /**
+             * Scenario
+             * @enum {string}
+             */
+            scenario: "cafe" | "job_interview" | "doctor" | "free_talk";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "finalizing" | "ended";
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Ended At */
+            ended_at: string | null;
+            /** Is Demo Data */
+            is_demo_data: boolean;
+        };
+        /** SessionScores */
+        SessionScores: {
+            /** Sufficient Sample */
+            sufficient_sample: boolean;
+            /** Insufficient Reason */
+            insufficient_reason: string | null;
+            /** Eligible Turns */
+            eligible_turns: number;
+            /** Assessed Turns */
+            assessed_turns: number;
+            /** Learner Turns */
+            learner_turns: number;
+            /** Eligible Words */
+            eligible_words: number;
+            /** Eligible Voiced Ms */
+            eligible_voiced_ms: number;
+            grammar: components["schemas"]["GrammarScore"];
+            fluency: components["schemas"]["FluencyScore"];
+            /** Scoring Version */
+            scoring_version: string;
+        };
+        /** SessionStartOut */
+        SessionStartOut: {
+            session: components["schemas"]["SessionOut"];
+            /** Opening Turn Id */
+            opening_turn_id: number;
+            /** Opening Text */
+            opening_text: string;
+        };
+        /** Strength */
+        Strength: {
+            /** Text */
+            text: string;
+            /** Evidence */
+            evidence: string;
+        };
+        /** TopicFrequency */
+        TopicFrequency: {
+            /** Topic */
+            topic: string;
+            /** Label */
+            label: string;
+            /** Errors */
+            errors: number;
+            /** Share */
+            share: number;
+            /** Sessions */
+            sessions: number;
+            /**
+             * Last Seen
+             * Format: date-time
+             */
+            last_seen: string;
+        };
+        /** TurnOut */
+        TurnOut: {
+            /** Turn Id */
+            turn_id: number;
+            /** Session Id */
+            session_id: number;
+            /** Seq */
+            seq: number;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "opening" | "learner";
+            /** Client Turn Id */
+            client_turn_id: string | null;
+            /**
+             * Correction Status
+             * @enum {string}
+             */
+            correction_status: "processing" | "stt_failed" | "analysis_failed" | "done";
+            /** Failure Code */
+            failure_code: string | null;
+            /** Transcript */
+            transcript: string | null;
+            /** Needs Clarification */
+            needs_clarification: boolean;
+            /** Misheard */
+            misheard: boolean;
+            /** Corrections */
+            corrections: components["schemas"]["CorrectionOut"][];
+            /** Spoken Correction Id */
+            spoken_correction_id: number | null;
+            /** Reply */
+            reply: string | null;
+        };
+        /** WrittenAnalysis */
+        WrittenAnalysis: {
+            /** Summary */
+            summary: string;
+            /** Strengths */
+            strengths: components["schemas"]["Strength"][];
+            /** Focus Areas */
+            focus_areas: components["schemas"]["FocusArea"][];
         };
     };
     responses: never;
@@ -53,6 +828,1045 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_profiles_api_profiles_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"][];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    create_profile_api_profiles_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    start_api_sessions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionStartOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_session_api_sessions__session_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    history_api_profiles__profile_id__sessions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                profile_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionHistoryOut"][];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    end_api_sessions__session_id__end_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    report_api_sessions__session_id__report_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    regenerate_api_sessions__session_id__report_regenerate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    list_turns_api_sessions__session_id__turns_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurnOut"][];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    submit_api_sessions__session_id__turns_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_submit_api_sessions__session_id__turns_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurnOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    by_client_api_sessions__session_id__turns_by_client__client_turn_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: number;
+                client_turn_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurnOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    speech_api_turns__turn_id__speech_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                turn_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                    "audio/mpeg": unknown;
+                    "audio/wav": unknown;
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    misheard_api_turns__turn_id__misheard_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                turn_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurnOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    not_a_mistake_api_mistakes__mistake_id__not_a_mistake_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                mistake_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CorrectionOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    create_api_quizzes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuizCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    grade_api_quizzes__quiz_id__attempts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                quiz_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuizAnswers"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuizAttemptOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    get_api_profiles__profile_id__analysis_get: {
+        parameters: {
+            query: {
+                language: "de" | "en";
+            };
+            header?: never;
+            path: {
+                profile_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnalysisOut"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
                 };
             };
         };
