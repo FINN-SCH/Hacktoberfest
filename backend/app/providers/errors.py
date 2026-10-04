@@ -25,10 +25,19 @@ async def post(client: httpx.AsyncClient, url: str, *, stage: str, timeout: floa
             code, retryable = "rate_limit", True
         elif status >= 500:
             code, retryable = "unavailable", True
+        elif status == 400 and _generation_failed(response):
+            code, retryable = "invalid_response", True
         else:
             code, retryable = "bad_request", False
         raise ProviderError(code, stage, retryable=retryable, status_code=status)
     return response
+
+def _generation_failed(response: httpx.Response) -> bool:
+    # Groq rejects schema-violating model output with 400; that is a bad generation, not a bad request.
+    try:
+        return response.json()["error"]["code"] in ("json_validate_failed", "output_parse_failed")
+    except (ValueError, KeyError, TypeError):
+        return False
 
 def json_object(response: httpx.Response, stage: str) -> dict[str, Any]:
     try:

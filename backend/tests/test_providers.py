@@ -74,6 +74,16 @@ async def test_http_errors_are_typed_without_downgrade(status, code, retryable):
     assert "secret_upstream_detail" not in str(error.value)
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("upstream", ["json_validate_failed", "output_parse_failed"])
+async def test_groq_rejected_generation_is_retryable_invalid_response(upstream):
+    async def handle(request):
+        return httpx.Response(400, json={"error": {"code": upstream, "failed_generation": "Gern!"}})
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handle)) as client:
+        with pytest.raises(ProviderError) as error:
+            await OpenAICompatibleLLM(settings(), client).complete([], schema={}, purpose="turn")
+    assert (error.value.code, error.value.retryable) == ("invalid_response", True)
+
+@pytest.mark.asyncio
 async def test_truncation_is_explicit():
     async def handle(request):
         return httpx.Response(200, json={"choices": [{"message": {"content": '{"corrections":'}, "finish_reason": "length"}]})

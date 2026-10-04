@@ -254,7 +254,12 @@ async def _run_analysis(db: DBSession, providers, settings, s: Session, t: Turn)
     model_name = None
     try:
         for attempt in range(2):  # one repair attempt, owned here
-            result = await providers.llm.complete(messages, schema=schema, purpose="turn")
+            try:
+                result = await providers.llm.complete(messages, schema=schema, purpose="turn")
+            except ProviderError as e:
+                if attempt == 0 and e.code == "invalid_response":
+                    continue
+                raise
             model_name = result.model
             try:
                 validated = parse_analysis(result.content, t.transcript, s.target_language)

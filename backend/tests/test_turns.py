@@ -113,7 +113,9 @@ async def test_turn_persists_corrections_and_speaks_recast(db):
     await turns.synthesize_turn(db, prov, out.turn_id)
     assert prov.tts.texts[-1] == "Du meinst: Ich bin nach Berlin gegangen. Was hast du dort gemacht?"
     history = prov.llm.seen[0]
-    assert history[1] == {"role": "assistant", "content": start.opening_text}
+    assert [m["role"] for m in history] == ["system", "user"]
+    assert "Tutor: " + start.opening_text in history[1]["content"]
+    assert history[1]["content"].endswith("Learner's LAST message (analyse this one):\nIch habe nach Berlin gegangen.")
 
 
 async def test_duplicate_submit_is_idempotent_and_conflicts_are_rejected(db):
@@ -136,6 +138,13 @@ async def test_invalid_llm_output_gets_one_repair(db):
     out = await submit(db, prov, sid)
     assert out.correction_status == "done" and prov.llm.calls == 2
     assert "rejected" in prov.llm.seen[1][-1]["content"]
+
+
+async def test_rejected_generation_is_retried_once(db):
+    sid = (await new_session(db)).session.id
+    prov = Providers(llm=FakeLLM(outputs=[ProviderError("invalid_response", "llm", retryable=True), json.dumps(GOOD)]))
+    out = await submit(db, prov, sid)
+    assert out.correction_status == "done" and prov.llm.calls == 2
 
 
 async def test_analysis_failure_keeps_transcript_and_retries_without_audio(db):

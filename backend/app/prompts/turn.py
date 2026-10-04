@@ -60,11 +60,16 @@ def build_messages(
     history: list[tuple[str, str]],
     transcript: str,
 ) -> list[dict[str, str]]:
-    """`history` = (role, text) pairs, oldest first, role "user" (learner) or "assistant" (tutor)."""
-    messages = [{"role": "system", "content": system_prompt(target_language, level, scenario, explanation_language)}]
-    messages += [{"role": role, "content": text} for role, text in history[-CONTEXT_TURNS * 2:]]
-    messages.append({"role": "user", "content": transcript})
-    return messages
+    """`history` = (role, text) pairs, oldest first, role "user" (learner) or "assistant" (tutor).
+
+    History goes into the user message as labelled data: plain-text assistant turns made models
+    answer in plain text instead of JSON (Groq json_validate_failed on correct sentences)."""
+    lines = [("Tutor: " if role == "assistant" else "Learner: ") + text for role, text in history[-CONTEXT_TURNS * 2:]]
+    context = "Conversation so far (oldest first):\n" + "\n".join(lines) + "\n\n" if lines else ""
+    return [
+        {"role": "system", "content": system_prompt(target_language, level, scenario, explanation_language)},
+        {"role": "user", "content": context + "Learner's LAST message (analyse this one):\n" + transcript},
+    ]
 
 
 def repair_messages(messages: list[dict[str, str]], bad_output: str, errors: list[str]) -> list[dict[str, str]]:
