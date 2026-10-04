@@ -1,10 +1,10 @@
 # Voice Language Tutor
 
-A voice-first language tutor powered entirely by **open-weight models**. Talk to it hands-free. It corrects your grammar out loud as you go, saves the full conversation as a transcript, rates the session, and turns your own past mistakes into a personalised quiz.
+A voice-first language tutor with **pluggable providers and an open-weight model path**. Talk to it hands-free. It corrects your grammar out loud as you go, saves the full conversation as a transcript, rates the session, and turns your own past mistakes into a personalised quiz.
 
 Built for the Hacktoberfest hackathon (theme: open-source / open-weight models).
 
-> Status: planning complete, implementation starting. See [PLAN.md](PLAN.md) for the full technical plan.
+> Status: implemented on `tutor-v2`. See [SETUP_GUIDE.md](SETUP_GUIDE.md) for setup and [PLAN.md](PLAN.md) for the technical plan.
 
 ## What it does
 
@@ -28,49 +28,72 @@ Wrong correction? Mark it **Not a mistake**. Speech recognition got you wrong? M
 ```
 Browser (React + Vite + TS)
   mic -> Silero VAD -> speech segment ----POST /turns----> FastAPI
-                                                            |- STT  : Whisper large-v3        (Groq)
-                                                            |- LLM  : gpt-oss-120b, JSON out  (Groq)
+                                                            |- STT  : faster-whisper or Groq Whisper
+                                                            |- LLM  : OpenAI-compatible proxy/API
                                                             |- save turn + mistakes           (SQLite)
   correction cards + reply text   <-------------------------+
-  tutor audio                     <----POST /speech---------- TTS : Chatterbox Multilingual (DeepInfra)
+  tutor audio                     <----POST /speech---------- TTS : Edge or DeepInfra Chatterbox
   (mic paused while the tutor speaks, then listening resumes)
 ```
 
 It's a cascaded speech-to-text, LLM, text-to-speech pipeline rather than a single speech-to-speech model. Corrections, transcripts, scoring and quizzes all need text, and a text pipeline lets us check every correction against what was actually said.
 
-## Open-weight models
+## Providers and open-weight models
 
-| Component | Model | License | Served by |
-|---|---|---|---|
-| Speech-to-text | OpenAI Whisper large-v3 | MIT | Groq |
-| Tutor / report / quiz / analysis LLM | OpenAI gpt-oss-120b | Apache 2.0 | Groq |
-| Text-to-speech | Resemble AI Chatterbox Multilingual | MIT | DeepInfra |
-| Voice activity detection | Silero VAD (via `@ricky0123/vad-react`) | MIT | runs in the browser |
+The default local setup uses LiteLLM at `http://localhost:4000/v1` (`qwen3.8-fast`), local faster-whisper, and Edge-TTS.
+**Edge-TTS is a proprietary Microsoft cloud voice, not an open-weight model or an offline service.**
+The [edge-tts client](https://github.com/rany2/edge-tts) calls Microsoft's online service.
+For the hackathon's open-weight theme, choose Whisper + gpt-oss/Qwen + Chatterbox instead.
 
-Every model client is a thin adapter with its base URL and model ID in `.env`, so any of them can be pointed at another host serving the same open weights.
+| Component | Supported paths | Open-weight status |
+|---|---|---|
+| Speech-to-text | Local faster-whisper large-v3-turbo; Groq Whisper large-v3 | [Whisper](https://github.com/openai/whisper) weights/code use MIT |
+| Tutor / report / quiz / analysis | OpenAI-compatible LiteLLM or Groq; local alias qwen3.8-fast or hosted gpt-oss-120b | [gpt-oss](https://huggingface.co/openai/gpt-oss-120b) is Apache 2.0; Qwen is an open-weight option, but verify the actual model/license behind the local proxy alias |
+| Text-to-speech (default) | Edge: en-US-AndrewNeural / de-DE-ConradNeural | Proprietary Microsoft cloud voices |
+| Text-to-speech (open-weight option) | DeepInfra ResembleAI/chatterbox-multilingual | [Chatterbox](https://github.com/resemble-ai/chatterbox) is MIT-licensed |
+| Browser voice activity detection | Silero VAD via @ricky0123/vad-react, assets served locally | [Silero VAD](https://github.com/snakers4/silero-vad) is MIT-licensed |
+
+Provider adapters are selected through `backend/.env`: `STT_PROVIDER=faster_whisper|groq`, `TTS_PROVIDER=edge|deepinfra`.
+The LLM adapter accepts an OpenAI-compatible base URL, model and explicit JSON mode.
+The local profile uses prompt-mode JSON; the hosted Groq profile uses json_schema. There is no automatic provider or JSON-mode downgrade.
 
 ## Tech stack
 
 - **Frontend:** React, Vite, TypeScript, `@ricky0123/vad-react`, Recharts
 - **Backend:** Python, FastAPI, SQLModel, SQLite
-- **Inference:** Groq (STT + LLM), DeepInfra (TTS), via hosted APIs
+- **Inference:** local LiteLLM + faster-whisper by default; Groq hosted option; Edge or DeepInfra TTS
 
-## Repository layout (planned)
+## Repository layout
 
 ```
 frontend/   React app: voice capture + VAD, conversation, report, history, quiz, analysis
-backend/    FastAPI app: providers (stt/llm/tts), tutoring, scoring, quizzes, analysis, grammar topics, db
-contracts/  agreed request/response JSON examples (frontend and backend build against these)
-tests/fixtures/  learner utterances and failure cases used by the spikes
+backend/    FastAPI: providers, services, routers, schemas, prompts, SQLite, tests, scripts
+frontend/src/api/generated.ts  TypeScript contracts generated from FastAPI OpenAPI
+backend/tests/  fake providers, HTTP contracts, scoring, evidence and setup checks
 ```
 
-## Getting started
+## Quick start
 
-Setup instructions land here once the scaffold exists. You will need:
+Use **branch tutor-v2**, Python **3.10+**, Node **22.11+**, and Chrome/Edge.
+Follow [SETUP_GUIDE.md](SETUP_GUIDE.md) for copy-paste Linux/Windows setup, local/hosted provider profiles, and troubleshooting.
+Coding agents should read [AGENTS.md](AGENTS.md) (opencode) or [GEMINI.md](GEMINI.md) (Gemini CLI).
 
-- Node.js 20+, Python 3.11+
-- A Groq API key and a DeepInfra API key in `backend/.env` (see `.env.example`)
-- Chrome or Edge (microphone + Web Audio)
+After installing dependencies, configuring `backend/.env`, and building the frontend:
+
+```bash
+(cd backend && .venv/bin/python -m app.seed)
+(cd backend && .venv/bin/python -m scripts.check_providers)
+chmod +x start.sh
+./start.sh
+```
+
+Open **http://127.0.0.1:5050**. Windows uses `start.ps1` instead.
+The seed command creates **Demo learner**, three German sessions and one English session, all labelled demo data, without any API calls.
+A second seed run refuses duplication; `--reset-demo` replaces only demo data and refuses if real practice would be affected.
+Use a separate profile for actual practice. Five eligible turns and sixty seconds of voiced speech are needed for ratings.
+
+Edge returns MP3, so the provider probe explicitly skips STT unless compatible WAV audio is supplied.
+Verify a real spoken browser turn before calling setup complete. The app is local-first, has no authentication, and stores learning history in SQLite.
 
 ## Team
 
