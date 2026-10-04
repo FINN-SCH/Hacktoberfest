@@ -226,6 +226,177 @@ const UI_TRANSLATIONS = {
     scenarioTech: "Tech & Architektur",
     scenarioTravel: "Reisen & Alltag",
     scenarioGrammar: "Grammatik-Fokus & Drills"
+  },
+  es: {
+    brandTitle: "Coach de Idiomas",
+    brandSubtitle: "Práctica de conversación y retroalimentación en tiempo real",
+    tabVoice: "Conversación",
+    tabQuiz: "Cuestionario",
+    tabAnalysis: "Análisis",
+    tabSettings: "Ajustes",
+    tapToSpeak: "Toca para hablar",
+    listening: "Escuchando...",
+    thinking: "Procesando...",
+    speaking: "El coach habla...",
+    ready: "Listo",
+    handsFreeOn: "Manos libres: ACTIVADO",
+    handsFreeOff: "Manos libres: DESACTIVADO",
+    pressSpace: "Presiona Espacio para alternar el micrófono",
+    quizTitle: "Practica tus puntos débiles",
+    quizSubtitle: "Preguntas interactivas generadas directamente a partir de tus errores reales.",
+    quizFresh: "Nuevas preguntas",
+    quizEmptyTitle: "Aún no hay errores activos",
+    quizEmptyDesc: "Habla en modo Conversación. Cualquier error se convertirá en un ejercicio específico aquí.",
+    quizGoConv: "Ir a conversación",
+    analysisTitle: "Progreso y análisis",
+    analysisSubtitle: "Seguimiento a largo plazo de precisión gramatical, patrones y fluidez.",
+    kpiAccLabel: "Turnos sin errores",
+    kpiAccSub: "Consistencia gramatical general",
+    kpiTurnsLabel: "Turnos hablados",
+    kpiErrorsLabel: "Correcciones activas",
+    kpiErrorsSub: "Excluyendo errores descartados",
+    coachDiagnosisTitle: "Diagnóstico y recomendaciones del tutor",
+    topicFreqTitle: "Frecuencia de errores por tema",
+    thTopic: "Tema",
+    thErrors: "Errores",
+    thShare: "Porcentaje",
+    thSessions: "Sesiones",
+    thLastSeen: "Última vez",
+    recurringTitle: "Errores recurrentes",
+    settingsTitle: "Ajustes y estado del sistema",
+    settingsSubtitle: "Configuración de hardware, parámetros del modelo y almacenamiento.",
+    settingsCheck: "Comprobar",
+    pipeTitle: "Infraestructura local",
+    settingsLangTitle: "Ajustes de idioma, voz y escenario",
+    lblPracticeLang: "Idioma",
+    lblVoice: "Voz activa",
+    lblScenario: "Escenario activo",
+    lblUILang: "Idioma de interfaz",
+    btnTestVoice: "Probar voz",
+    testVoiceTip: "Sintetiza una breve muestra de voz mediante Edge-TTS y la reproduce localmente.",
+    dataMgmtTitle: "Gestión de datos",
+    clearHistoryHeading: "Borrar historial y base de datos",
+    clearHistoryDesc: "Elimina todos los turnos, errores, cuestionarios y análisis de tutor.db.",
+    btnClearHistory: "Borrar historial",
+    scenarioCasual: "Conversación casual",
+    scenarioInterview: "Práctica de entrevista",
+    scenarioTech: "Tecnología y arquitectura",
+    scenarioTravel: "Viajes y vida diaria",
+    scenarioGrammar: "Enfoque gramatical y drills"
+  },
+  fr: {
+    brandTitle: "Coach Linguistique",
+    brandSubtitle: "Entraînement à la conversation et retour en temps réel",
+    tabVoice: "Conversation",
+    tabQuiz: "Quiz d'entraînement",
+    tabAnalysis: "Analyse",
+    tabSettings: "Paramètres",
+    tapToSpeak: "Appuyez pour parler",
+    listening: "À l'écoute...",
+    thinking: "Traitement en cours...",
+    speaking: "Le coach parle...",
+    ready: "Prêt",
+    handsFreeOn: "Mains libres : ACTIVÉ",
+    handsFreeOff: "Mains libres : DÉSACTIVÉ",
+    pressSpace: "Appuyez sur Espace pour basculer le microphone",
+    quizTitle: "Travaillez vos points faibles",
+    quizSubtitle: "Questions interactives générées à partir de vos erreurs réelles en conversation.",
+    quizFresh: "Nouvelles questions",
+    quizEmptyTitle: "Aucune erreur active",
+    quizEmptyDesc: "Parlez en mode Conversation. Chaque erreur deviendra un exercice sur mesure ici.",
+    quizGoConv: "Aller à la conversation",
+    analysisTitle: "Progression et analyse",
+    analysisSubtitle: "Suivi à long terme de votre précision grammaticale et de votre aisance.",
+    kpiAccLabel: "Tours sans erreur",
+    kpiAccSub: "Cohérence grammaticale globale",
+    kpiTurnsLabel: "Tours parlés",
+    kpiErrorsLabel: "Corrections actives",
+    kpiErrorsSub: "Hors erreurs ignorées",
+    coachDiagnosisTitle: "Diagnostic et conseils du coach",
+    topicFreqTitle: "Fréquence des erreurs par règle",
+    thTopic: "Règle",
+    thErrors: "Erreurs",
+    thShare: "Part",
+    thSessions: "Sessions",
+    thLastSeen: "Dernière fois",
+    recurringTitle: "Erreurs récurrentes",
+    settingsTitle: "Paramètres & État du système",
+    settingsSubtitle: "Configuration matérielle, modèles et gestion du stockage.",
+    settingsCheck: "Vérifier",
+    pipeTitle: "Infrastructure locale",
+    settingsLangTitle: "Paramètres de langue, voix & scénario",
+    lblPracticeLang: "Langue",
+    lblVoice: "Voix active",
+    lblScenario: "Scénario actif",
+    lblUILang: "Langue de l'interface",
+    btnTestVoice: "Tester la voix",
+    testVoiceTip: "Synthétise un court extrait vocal via Edge-TTS et le lit localement.",
+    dataMgmtTitle: "Gestion des données",
+    clearHistoryHeading: "Effacer l'historique et la base",
+    clearHistoryDesc: "Supprime tous les échanges, erreurs, quiz et analyses de tutor.db.",
+    btnClearHistory: "Effacer l'historique",
+    scenarioCasual: "Conversation décontractée",
+    scenarioInterview: "Entraînement entretien",
+    scenarioTech: "Tech & Architecture logicielle",
+    scenarioTravel: "Voyages & Quotidien",
+    scenarioGrammar: "Focus grammaire & Exercices"
+  },
+  it: {
+    brandTitle: "Tutor Linguistico",
+    brandSubtitle: "Pratica di conversazione e feedback in tempo reale",
+    tabVoice: "Conversazione",
+    tabQuiz: "Quiz di pratica",
+    tabAnalysis: "Analisi",
+    tabSettings: "Impostazioni",
+    tapToSpeak: "Tocca per parlare",
+    listening: "In ascolto...",
+    thinking: "Elaborazione...",
+    speaking: "Il tutor parla...",
+    ready: "Pronto",
+    handsFreeOn: "Vivavoce: ATTIVO",
+    handsFreeOff: "Vivavoce: DISATTIVO",
+    pressSpace: "Premi Spazio per attivare o disattivare il microfono",
+    quizTitle: "Esercitati sui tuoi punti deboli",
+    quizSubtitle: "Domande interattive generate direttamente dai tuoi errori reali.",
+    quizFresh: "Nuove domande",
+    quizEmptyTitle: "Nessun errore attivo finora",
+    quizEmptyDesc: "Parla in modalità Conversazione. Qualsiasi errore diventerà automaticamente un quiz qui.",
+    quizGoConv: "Vai alla conversazione",
+    analysisTitle: "Progresso e analisi",
+    analysisSubtitle: "Monitoraggio a lungo termine di accuratezza, schemi e fluidità.",
+    kpiAccLabel: "Turni corretti",
+    kpiAccSub: "Accuratezza grammaticale complessiva",
+    kpiTurnsLabel: "Frasi pronunciate",
+    kpiErrorsLabel: "Correzioni attive",
+    kpiErrorsSub: "Esclusi errori ignorati",
+    coachDiagnosisTitle: "Diagnosi ed indicazioni del tutor",
+    topicFreqTitle: "Frequenza errori per argomento",
+    thTopic: "Argomento",
+    thErrors: "Errori",
+    thShare: "Quota",
+    thSessions: "Sessioni",
+    thLastSeen: "Ultimo",
+    recurringTitle: "Errori ricorrenti",
+    settingsTitle: "Impostazioni e stato di sistema",
+    settingsSubtitle: "Configurazione hardware, modelli e gestione database.",
+    settingsCheck: "Verifica",
+    pipeTitle: "Infrastruttura locale",
+    settingsLangTitle: "Impostazioni lingua, voce e scenario",
+    lblPracticeLang: "Lingua",
+    lblVoice: "Voce attiva",
+    lblScenario: "Scenario attivo",
+    lblUILang: "Lingua interfaccia",
+    btnTestVoice: "Prova voce",
+    testVoiceTip: "Sintetizza un breve campione audio con Edge-TTS e lo riproduce localmente.",
+    dataMgmtTitle: "Gestione dati",
+    clearHistoryHeading: "Cancella cronologia e database",
+    clearHistoryDesc: "Elimina tutte le conversazioni, gli errori, i quiz e le analisi da tutor.db.",
+    btnClearHistory: "Cancella cronologia",
+    scenarioCasual: "Conversazione informale",
+    scenarioInterview: "Simulazione colloquio",
+    scenarioTech: "Tecnologia & Architettura",
+    scenarioTravel: "Viaggi & Vita quotidiana",
+    scenarioGrammar: "Focus grammatica & Esercizi"
   }
 };
 
@@ -278,7 +449,6 @@ const continuousBtn = document.getElementById("continuous-btn");
 const continuousLabel = document.getElementById("continuous-label");
 const textInput = document.getElementById("text-input");
 const languageSelect = document.getElementById("language-select");
-const uiLangSelect = document.getElementById("ui-lang-select");
 const scenarioSelect = document.getElementById("scenario-select");
 const voiceSelect = document.getElementById("voice-select");
 const quizBadge = document.getElementById("quiz-badge");
@@ -1116,7 +1286,9 @@ function changeVoice(val) {
 function changeLanguage(val, startFresh = true) {
   if (!LANG_DATA[val]) val = "en";
   currentLanguage = val;
+  uiLanguage = val;
   localStorage.setItem("jarvis_coach_lang", val);
+  localStorage.setItem("jarvis_ui_lang", val);
 
   if (languageSelect && languageSelect.value !== val) {
     languageSelect.value = val;
@@ -1125,6 +1297,9 @@ function changeLanguage(val, startFresh = true) {
   if (settingsLangSelect && settingsLangSelect.value !== val) {
     settingsLangSelect.value = val;
   }
+
+  // Unified language switch: synchronize entire UI interface language with practice language
+  applyUILanguage(val);
 
   const info = LANG_DATA[val];
   currentVoice = info.defaultVoice;
@@ -1146,7 +1321,7 @@ function changeLanguage(val, startFresh = true) {
     updateQuizBadge(0);
   }
 
-  console.log("Practice language set to:", val, "Voice:", currentVoice);
+  console.log("Unified language set to:", val, "Voice:", currentVoice);
 }
 
 function updateVoiceDropdowns(lang) {
@@ -1177,24 +1352,6 @@ function renderStarters(lang) {
   container.innerHTML = info.starters.map(s => `
     <button type="button" class="topic-chip" onclick="quickSend('${escapeHtml(s.text)}')">${escapeHtml(s.label)}</button>
   `).join("");
-}
-
-function changeUILanguage(val) {
-  if (!UI_TRANSLATIONS[val]) val = "en";
-  uiLanguage = val;
-  localStorage.setItem("jarvis_ui_lang", val);
-
-  if (uiLangSelect && uiLangSelect.value !== val) {
-    uiLangSelect.value = val;
-  }
-  const settingsUiSelect = document.getElementById("settings-ui-lang-select");
-  if (settingsUiSelect && settingsUiSelect.value !== val) {
-    settingsUiSelect.value = val;
-  }
-
-  applyUILanguage(val);
-  setUIState(appState);
-  console.log("UI language changed to:", val);
 }
 
 function applyUILanguage(lang) {
@@ -1258,8 +1415,6 @@ function applyUILanguage(lang) {
   if (lblVoice) lblVoice.textContent = t.lblVoice;
   const lblScenario = document.getElementById("lbl-settings-scenario");
   if (lblScenario) lblScenario.textContent = t.lblScenario;
-  const lblUiLang = document.getElementById("lbl-settings-ui-lang");
-  if (lblUiLang) lblUiLang.textContent = t.lblUILang;
   const btnTestVoice = document.querySelector("#btn-test-voice span");
   if (btnTestVoice) btnTestVoice.textContent = t.btnTestVoice;
   const tipVoice = document.querySelector(".settings-tip-text");
@@ -1290,10 +1445,6 @@ function applyUILanguage(lang) {
 
 function syncLanguageFromSettings(val) {
   changeLanguage(val);
-}
-
-function syncUILangFromSettings(val) {
-  changeUILanguage(val);
 }
 
 function quickSend(text) {
@@ -1602,11 +1753,7 @@ window.addEventListener("keydown", (e) => {
 
 window.addEventListener("DOMContentLoaded", () => {
   console.log("Language Coach ready.");
-  applyUILanguage(uiLanguage);
   changeLanguage(currentLanguage, false);
-  if (uiLangSelect) uiLangSelect.value = uiLanguage;
-  const settingsUiSelect = document.getElementById("settings-ui-lang-select");
-  if (settingsUiSelect) settingsUiSelect.value = uiLanguage;
   // Pre-fetch health in background for settings tab
   loadSettings(false);
 });
