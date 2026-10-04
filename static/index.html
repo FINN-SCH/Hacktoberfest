@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>English Voice Coach • Live Conversation & Grammar Tutor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css?v=4">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="brand-wrap">
+      <div class="brand-icon">EN</div>
+      <div>
+        <h1 class="brand-title">English Voice Coach</h1>
+        <div class="brand-subtitle">Interactive Spoken Practice & Live Grammar Correction</div>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <!-- Scenario Selector -->
+      <select id="scenario-select" class="select-pill" onchange="changeScenario(this.value)">
+        <option value="casual">☕ Casual Coffee Chat</option>
+        <option value="interview">💼 Job Interview Practice</option>
+        <option value="tech">💻 Tech & Software Discussion</option>
+        <option value="travel">✈️ Travel & Daily Life</option>
+        <option value="grammar">📚 Strict Grammar Drill</option>
+      </select>
+
+      <!-- Voice Accent Selector -->
+      <select id="voice-select" class="select-pill" onchange="changeVoice(this.value)">
+        <option value="en-US-AndrewNeural">🇺🇸 Andrew (US Natural)</option>
+        <option value="en-US-AvaNeural">🇺🇸 Ava (US Warm)</option>
+        <option value="en-GB-RyanNeural">🇬🇧 Ryan (UK British)</option>
+        <option value="en-GB-SoniaNeural">🇬🇧 Sonia (UK Gentle)</option>
+      </select>
+
+      <div class="status-badge" id="status-badge">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">READY</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Stage -->
+  <main class="container">
+    <!-- Tutor Interactive Orb -->
+    <div class="tutor-orb-section">
+      <div class="orb-wrapper" id="orb-wrapper" onclick="handleOrbClick()" title="Click or press Space to Speak">
+        <div class="orb-glow"></div>
+        <button type="button" class="orb-btn" id="orb-btn">
+          <svg class="orb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="22"/>
+          </svg>
+          <span class="orb-label" id="orb-label">TAP TO SPEAK</span>
+        </button>
+      </div>
+
+      <!-- Realtime Audio Waveform -->
+      <canvas class="visualizer-canvas" id="visualizer" width="640" height="84"></canvas>
+    </div>
+
+    <!-- Coach Dialogue & Feedback Card -->
+    <div class="coach-card">
+      <!-- User speech -->
+      <div class="turn-box">
+        <div class="turn-header">
+          <span class="turn-tag user">What You Said</span>
+        </div>
+        <div class="turn-content empty" id="user-transcript">
+          Press the microphone button or spacebar and say anything in English...
+        </div>
+      </div>
+
+      <!-- Live Grammar & Phrasing Feedback -->
+      <div class="feedback-banner empty" id="feedback-banner">
+        <div class="feedback-icon" id="feedback-icon">💡</div>
+        <div class="feedback-text" id="feedback-text"></div>
+      </div>
+
+      <!-- Tutor Response -->
+      <div class="turn-box">
+        <div class="turn-header">
+          <span class="turn-tag coach">Tutor Response</span>
+        </div>
+        <div class="turn-content" id="coach-response">
+          "Hello Jonathan! I'm your English conversation coach. Speak with me about anything you like, and I'll gently correct any mistakes along the way. What would you like to talk about today?"
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Topic Starters -->
+    <div class="topic-chips">
+      <button type="button" class="topic-chip" onclick="quickSend('Hi! Can you help me practice for a tech job interview?')">💼 Practice Job Interview</button>
+      <button type="button" class="topic-chip" onclick="quickSend('Yesterday I go to the supermarket and buyed some apples.')">🔍 Test Grammar Correction</button>
+      <button type="button" class="topic-chip" onclick="quickSend('What are your top three tips for improving my English fluency?')">🗣️ Tips for Fluency</button>
+      <button type="button" class="topic-chip" onclick="quickSend('Let us have a debate about artificial intelligence.')">🤖 Debate on AI</button>
+    </div>
+
+    <!-- Bottom Controls Bar -->
+    <div class="controls-bar">
+      <button type="button" class="continuous-btn" id="continuous-btn" onclick="toggleContinuousMode()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span id="continuous-label">Hands-Free: OFF</span>
+      </button>
+
+      <form class="input-group" onsubmit="handleFormSubmit(event)">
+        <input type="text" class="text-input" id="text-input" placeholder="Type a sentence in English to check grammar or chat..." autocomplete="off">
+        <button type="submit" class="submit-btn" aria-label="Send">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </form>
+    </div>
+
+    <div class="footer-tip">
+      Press <kbd style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-family:monospace;">Spacebar</kbd> anytime to start or stop speaking • Audio powered by Faster-Whisper & Neural TTS
+    </div>
+  </main>
+
+  <script src="/static/app.js?v=4"></script>
+</body>
+</html>
