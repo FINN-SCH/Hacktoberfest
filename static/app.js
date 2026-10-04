@@ -55,22 +55,29 @@ function switchView(viewName) {
   const voiceTab = document.getElementById("tab-voice");
   const quizTab = document.getElementById("tab-quiz");
   const analysisTab = document.getElementById("tab-analysis");
+  const settingsTab = document.getElementById("tab-settings");
+
   const voiceView = document.getElementById("view-voice");
   const quizView = document.getElementById("view-quiz");
   const analysisView = document.getElementById("view-analysis");
+  const settingsView = document.getElementById("view-settings");
 
-  voiceTab.classList.toggle("active", viewName === "voice");
-  quizTab.classList.toggle("active", viewName === "quiz");
-  analysisTab.classList.toggle("active", viewName === "analysis");
+  if (voiceTab) voiceTab.classList.toggle("active", viewName === "voice");
+  if (quizTab) quizTab.classList.toggle("active", viewName === "quiz");
+  if (analysisTab) analysisTab.classList.toggle("active", viewName === "analysis");
+  if (settingsTab) settingsTab.classList.toggle("active", viewName === "settings");
 
-  voiceView.style.display = viewName === "voice" ? "block" : "none";
-  quizView.style.display = viewName === "quiz" ? "block" : "none";
-  analysisView.style.display = viewName === "analysis" ? "block" : "none";
+  if (voiceView) voiceView.style.display = viewName === "voice" ? "block" : "none";
+  if (quizView) quizView.style.display = viewName === "quiz" ? "block" : "none";
+  if (analysisView) analysisView.style.display = viewName === "analysis" ? "block" : "none";
+  if (settingsView) settingsView.style.display = viewName === "settings" ? "block" : "none";
 
   if (viewName === "quiz") {
     loadQuiz(false);
   } else if (viewName === "analysis") {
     loadAnalysis(false);
+  } else if (viewName === "settings") {
+    loadSettings(false);
   }
 }
 
@@ -756,6 +763,10 @@ function toggleContinuousMode() {
 
 function changeScenario(val) {
   currentScenario = val;
+  const settingsScenarioSelect = document.getElementById("settings-scenario-select");
+  if (settingsScenarioSelect && settingsScenarioSelect.value !== val) {
+    settingsScenarioSelect.value = val;
+  }
   console.log("Scenario changed to:", val);
   
   // Starting a new scenario resets the session so the coach opens with the new scenario prompt
@@ -770,6 +781,14 @@ function changeScenario(val) {
 
 function changeVoice(val) {
   currentVoice = val;
+  const settingsVoiceSelect = document.getElementById("settings-voice-select");
+  if (settingsVoiceSelect && settingsVoiceSelect.value !== val) {
+    settingsVoiceSelect.value = val;
+  }
+  const ttsVoiceEl = document.getElementById("settings-tts-voice");
+  if (ttsVoiceEl) {
+    ttsVoiceEl.textContent = `Voice: ${val} (audio/mpeg MP3)`;
+  }
   console.log("Voice changed to:", val);
 }
 
@@ -892,24 +911,91 @@ function renderAnalysis(data) {
   }
 }
 
-// Settings Modal & Context Reset
-function openSettingsModal() {
-  const modal = document.getElementById("settings-modal");
-  if (modal) {
-    modal.style.display = "flex";
+// ==========================================================================
+// Settings View & System Configuration
+// ==========================================================================
+let settingsHealthData = null;
+
+async function loadSettings(force = false) {
+  const statusEl = document.getElementById("settings-pipeline-status");
+  const sttModelEl = document.getElementById("settings-stt-model");
+  const sttDeviceEl = document.getElementById("settings-stt-device");
+  const llmModelEl = document.getElementById("settings-llm-model");
+  const llmEndpointEl = document.getElementById("settings-llm-endpoint");
+  const ttsModelEl = document.getElementById("settings-tts-model");
+  const ttsVoiceEl = document.getElementById("settings-tts-voice");
+  const settingsVoiceSelect = document.getElementById("settings-voice-select");
+  const settingsScenarioSelect = document.getElementById("settings-scenario-select");
+
+  if (settingsVoiceSelect) settingsVoiceSelect.value = currentVoice;
+  if (settingsScenarioSelect) settingsScenarioSelect.value = currentScenario;
+
+  if (settingsHealthData && !force) return;
+
+  try {
+    const res = await fetch("/api/health");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    settingsHealthData = data;
+
+    if (statusEl) {
+      statusEl.textContent = `PIPELINE ${data.status.toUpperCase()} (${data.pipeline?.stt?.device || 'CUDA RTX 5090'})`;
+    }
+    if (sttModelEl && data.pipeline?.stt) {
+      sttModelEl.textContent = `Faster-Whisper (${data.pipeline.stt.model.toUpperCase()})`;
+    }
+    if (sttDeviceEl && data.pipeline?.stt) {
+      sttDeviceEl.textContent = `Device: ${data.pipeline.stt.device} • ${data.pipeline.stt.compute_type}`;
+    }
+    if (llmModelEl && data.pipeline?.llm) {
+      llmModelEl.textContent = `${data.pipeline.llm.model}`;
+    }
+    if (llmEndpointEl && data.pipeline?.llm) {
+      llmEndpointEl.textContent = `Server: ${data.pipeline.llm.server}`;
+    }
+    if (ttsModelEl && data.pipeline?.tts) {
+      ttsModelEl.textContent = `${data.pipeline.tts.engine}`;
+    }
+    if (ttsVoiceEl && data.pipeline?.tts) {
+      ttsVoiceEl.textContent = `Voice: ${currentVoice} (${data.pipeline.tts.format})`;
+    }
+  } catch (err) {
+    console.error("Health fetch error:", err);
+    if (statusEl) statusEl.textContent = "PIPELINE OFFLINE / UNREACHABLE";
   }
 }
 
-function closeSettingsModal() {
-  const modal = document.getElementById("settings-modal");
-  if (modal) {
-    modal.style.display = "none";
-  }
+function syncVoiceFromSettings(val) {
+  if (voiceSelect) voiceSelect.value = val;
+  changeVoice(val);
+  const ttsVoiceEl = document.getElementById("settings-tts-voice");
+  if (ttsVoiceEl) ttsVoiceEl.textContent = `Voice: ${val} (audio/mpeg MP3)`;
 }
 
-function handleModalBackdropClick(event) {
-  if (event.target && event.target.id === "settings-modal") {
-    closeSettingsModal();
+function syncScenarioFromSettings(val) {
+  const scenarioSelect = document.getElementById("scenario-select");
+  if (scenarioSelect) scenarioSelect.value = val;
+  changeScenario(val);
+}
+
+let testVoiceAudio = null;
+async function testCurrentVoice() {
+  const btn = document.getElementById("btn-test-voice");
+  if (btn) btn.disabled = true;
+
+  try {
+    if (testVoiceAudio) {
+      testVoiceAudio.pause();
+      testVoiceAudio = null;
+    }
+    const sampleText = encodeURIComponent("Hello Jonathan! Your neural voice output is functioning smoothly on the RTX 5090.");
+    const url = `/api/tts?text=${sampleText}&voice=${encodeURIComponent(currentVoice)}`;
+    testVoiceAudio = new Audio(url);
+    await testVoiceAudio.play();
+  } catch (e) {
+    console.error("Voice test failed:", e);
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
@@ -918,13 +1004,16 @@ async function resetAllContextData() {
   if (!confirmed) return;
 
   const btn = document.getElementById("btn-reset-data");
-  if (btn) btn.textContent = "Clearing...";
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<span>Clearing...</span>`;
+  }
 
   try {
     const res = await fetch("/api/reset", { method: "POST" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     
-    // Reset local state
+    // Reset local client state
     conversationHistory = [];
     isSessionStarted = false;
     currentSessionId = "session_" + Date.now();
@@ -944,24 +1033,23 @@ async function resetAllContextData() {
     feedbackActions.style.display = "none";
     setUIState("idle");
 
-    closeSettingsModal();
-    alert("Context and history have been successfully cleared!");
+    alert("Context and conversation history have been successfully cleared!");
   } catch (err) {
     console.error("Reset error:", err);
     alert("Error resetting data: " + err.message);
   } finally {
-    if (btn) btn.textContent = "🗑️ Clear All Context";
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span>Clear All Context</span>`;
+    }
   }
 }
 
 // Spacebar Key listener
 window.addEventListener("keydown", (e) => {
-  if (e.code === "Escape") {
-    closeSettingsModal();
-  }
-  if (e.code === "Space" && e.target !== textInput) {
-    const modal = document.getElementById("settings-modal");
-    if (modal && modal.style.display !== "none") return;
+  if (e.code === "Space" && e.target !== textInput && e.target.tagName !== "SELECT" && e.target.tagName !== "INPUT") {
+    const voiceView = document.getElementById("view-voice");
+    if (voiceView && voiceView.style.display === "none") return;
     e.preventDefault();
     handleOrbClick();
   }
@@ -969,4 +1057,6 @@ window.addEventListener("keydown", (e) => {
 
 window.addEventListener("DOMContentLoaded", () => {
   console.log("Language Coach ready.");
+  // Pre-fetch health in background for settings tab
+  loadSettings(false);
 });

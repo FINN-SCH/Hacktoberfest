@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css?v=7">
+  <link rel="stylesheet" href="/static/style.css?v=11">
 </head>
 <body>
   <!-- Header Bar -->
@@ -41,6 +41,10 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         <span>Analysis</span>
       </button>
+      <button type="button" class="nav-segment-btn" id="tab-settings" onclick="switchView('settings')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Settings</span>
+      </button>
     </nav>
 
     <!-- Header Right Controls -->
@@ -60,10 +64,6 @@
           <option value="en-GB-RyanNeural">🇬🇧 Ryan (UK)</option>
           <option value="en-GB-SoniaNeural">🇬🇧 Sonia (UK)</option>
         </select>
-
-        <button type="button" class="btn-settings-icon" onclick="openSettingsModal()" title="Settings & Pipeline Status" aria-label="Settings">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
       </div>
 
       <div class="status-badge" id="status-badge">
@@ -272,85 +272,145 @@
         </div>
 
       </div>
+    <!-- SETTINGS & SYSTEM PIPELINE VIEW -->
+    <div id="view-settings" class="view-panel" style="display: none;">
+      <div class="settings-container">
+        
+        <!-- Header Banner -->
+        <div class="settings-header-banner">
+          <div>
+            <h2 class="quiz-title">Settings & System Pipeline</h2>
+            <p class="quiz-subtitle">Local hardware acceleration, model routing, speech parameters, and session context.</p>
+          </div>
+          <div class="settings-system-badge" id="settings-status-indicator">
+            <span class="status-dot connected"></span>
+            <span id="settings-pipeline-status">PIPELINE ONLINE (CUDA RTX 5090)</span>
+          </div>
+        </div>
+
+        <!-- System Architecture Overview / Pipeline Flow -->
+        <div class="settings-card">
+          <div class="settings-card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>Active AI Pipeline & Local Infrastructure</span>
+          </div>
+          
+          <div class="pipeline-flow-grid">
+            <!-- STT -->
+            <div class="pipe-node-card">
+              <div class="pipe-node-top">
+                <span class="pipe-node-icon">🎙️</span>
+                <span class="pipe-badge cuda">CUDA • RTX 5090</span>
+              </div>
+              <div class="pipe-node-name">Speech-to-Text (STT)</div>
+              <div class="pipe-node-model" id="settings-stt-model">Faster-Whisper (Large-v3-Turbo)</div>
+              <p class="pipe-node-desc">CTranslate2 int8_float16. ESL acoustic adaptation preserves verbatim grammar slips without auto-correction.</p>
+              <div class="pipe-node-spec" id="settings-stt-device">Device: CUDA (RTX 5090)</div>
+            </div>
+
+            <!-- LLM -->
+            <div class="pipe-node-card">
+              <div class="pipe-node-top">
+                <span class="pipe-node-icon">🧠</span>
+                <span class="pipe-badge local">SGLang • Port 30050</span>
+              </div>
+              <div class="pipe-node-name">Conversational Coach (LLM)</div>
+              <div class="pipe-node-model" id="settings-llm-model">qwen3.8-fast</div>
+              <p class="pipe-node-desc">Local SGLang inference proxy routed via LiteLLM. Zero reasoning token overhead, real-time streaming tokens.</p>
+              <div class="pipe-node-spec" id="settings-llm-endpoint">Endpoint: http://localhost:4000/v1</div>
+            </div>
+
+            <!-- TTS -->
+            <div class="pipe-node-card">
+              <div class="pipe-node-top">
+                <span class="pipe-node-icon">🔊</span>
+                <span class="pipe-badge stream">Neural Stream</span>
+              </div>
+              <div class="pipe-node-name">Speech Synthesis (TTS)</div>
+              <div class="pipe-node-model" id="settings-tts-model">Edge-TTS Neural Audio</div>
+              <p class="pipe-node-desc">Concurrent multi-chunk sentence streaming with audio buffer preloading in MP3 format.</p>
+              <div class="pipe-node-spec" id="settings-tts-voice">Voice: en-US-AndrewNeural</div>
+            </div>
+
+            <!-- Database -->
+            <div class="pipe-node-card">
+              <div class="pipe-node-top">
+                <span class="pipe-node-icon">💾</span>
+                <span class="pipe-badge db">Local SQLite3</span>
+              </div>
+              <div class="pipe-node-name">Memory & Taxonomy Store</div>
+              <div class="pipe-node-model">Embedded SQLite3 (tutor.db)</div>
+              <p class="pipe-node-desc">ACID persistence for spoken turns, categorized mistakes, deterministic quiz generation, and long-term trends.</p>
+              <div class="pipe-node-spec">Tables: sessions, turns, mistakes, quiz_attempts, written_analyses</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coach Configuration & Voice Tester Card -->
+        <div class="settings-card">
+          <div class="settings-card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Coach Persona & Audio Output</span>
+          </div>
+
+          <div class="settings-form-grid">
+            <div class="settings-field">
+              <label for="settings-voice-select" class="settings-label">Active Voice Persona</label>
+              <select id="settings-voice-select" class="settings-select" onchange="syncVoiceFromSettings(this.value)">
+                <option value="en-US-AndrewNeural">🇺🇸 Andrew (US Neural - Natural & Warm)</option>
+                <option value="en-US-AvaNeural">🇺🇸 Ava (US Neural - Expressive & Clear)</option>
+                <option value="en-GB-RyanNeural">🇬🇧 Ryan (UK Neural - Formal & Articulate)</option>
+                <option value="en-GB-SoniaNeural">🇬🇧 Sonia (UK Neural - Friendly & Bright)</option>
+              </select>
+            </div>
+
+            <div class="settings-field">
+              <label for="settings-scenario-select" class="settings-label">Coaching Scenario</label>
+              <select id="settings-scenario-select" class="settings-select" onchange="syncScenarioFromSettings(this.value)">
+                <option value="casual">☕ Casual Chat (Relaxed conversational pace)</option>
+                <option value="interview">💼 Job Interview (Professional questions & polite tone)</option>
+                <option value="tech">💻 Tech & Code (System design, architecture & software)</option>
+                <option value="travel">✈️ Travel & Life (Practical vocabulary, situational)</option>
+                <option value="grammar">📚 Strict Drill (Immediate correction on every slip)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="settings-actions-row">
+            <button type="button" class="btn-secondary-action" id="btn-test-voice" onclick="testCurrentVoice()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <span>Test Neural Voice Output</span>
+            </button>
+            <span class="settings-tip-text">Audio synthesized directly via Edge-TTS and played through the local audio context.</span>
+          </div>
+        </div>
+
+        <!-- Data & Context Management (Reset All Context) -->
+        <div class="settings-card danger-card">
+          <div class="settings-card-title danger">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Data & Context Management</span>
+          </div>
+          
+          <div class="danger-card-body">
+            <div class="danger-info">
+              <div class="danger-heading">Clear All Context & History</div>
+              <p class="danger-explanation">
+                Permanently wipes all spoken turns, conversation history, recorded grammatical mistakes, quiz question attempts, and long-term analysis aggregations from <code>tutor.db</code>.
+              </p>
+            </div>
+            <button type="button" class="btn-danger-reset" id="btn-reset-data" onclick="resetAllContextData()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              <span>Clear All Context</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
     </div>
 
   </main>
 
-  <!-- Settings & Pipeline Modal -->
-  <div class="modal-backdrop" id="settings-modal" style="display:none;" onclick="handleModalBackdropClick(event)">
-    <div class="modal-dialog">
-      <div class="modal-header">
-        <div class="modal-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          <span>Pipeline & Settings</span>
-        </div>
-        <button type="button" class="btn-close-modal" onclick="closeSettingsModal()" aria-label="Close">✕</button>
-      </div>
-
-      <div class="modal-body">
-        <!-- Models & APIs Info Section -->
-        <div class="settings-section">
-          <div class="settings-section-title">ACTIVE AI MODELS & APIS</div>
-          <div class="pipeline-cards">
-            <!-- STT -->
-            <div class="pipeline-card">
-              <div class="pipe-header">
-                <span class="pipe-name">🎙️ Speech-to-Text (STT)</span>
-                <span class="pipe-badge cuda">CUDA</span>
-              </div>
-              <div class="pipe-model">Faster-Whisper (Large-v3-Turbo)</div>
-              <div class="pipe-details">Running locally via CTranslate2 on NVIDIA RTX 5090 (int8_float16). Tuned with ESL phonetic prompt for verbatim grammatical errors.</div>
-            </div>
-
-            <!-- LLM -->
-            <div class="pipeline-card">
-              <div class="pipe-header">
-                <span class="pipe-name">🧠 Conversational Coach (LLM)</span>
-                <span class="pipe-badge local">SGLang</span>
-              </div>
-              <div class="pipe-model" id="settings-llm-model">qwen3.8-fast</div>
-              <div class="pipe-details">Local SGLang inference engine (Port 30050) routed through LiteLLM (Port 4000). Zero reasoning delay, streaming tokens in real time.</div>
-            </div>
-
-            <!-- TTS -->
-            <div class="pipeline-card">
-              <div class="pipe-header">
-                <span class="pipe-name">🔊 Text-to-Speech (TTS)</span>
-                <span class="pipe-badge stream">Streaming</span>
-              </div>
-              <div class="pipe-model">Edge-TTS Neural Audio</div>
-              <div class="pipe-details">Chunked sentence streaming with concurrent client preloading (MP3 audio). Voices: Andrew, Ava, Ryan, Sonia.</div>
-            </div>
-
-            <!-- Database -->
-            <div class="pipeline-card">
-              <div class="pipe-header">
-                <span class="pipe-name">💾 Storage & Taxonomy</span>
-                <span class="pipe-badge db">SQLite</span>
-              </div>
-              <div class="pipe-model">Embedded SQLite3 (tutor.db)</div>
-              <div class="pipe-details">Tables for sessions, spoken turns, grammar taxonomy topics, mistake exclusions, and deterministic quiz attempts.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Danger Zone: Reset Data -->
-        <div class="settings-section danger-zone">
-          <div class="settings-section-title danger">DATA & CONTEXT MANAGEMENT</div>
-          <div class="danger-box">
-            <div>
-              <div class="danger-title">Clear Context, History & Quiz Data</div>
-              <div class="danger-desc">Deletes all saved turns, recorded mistakes, practice quiz history, and cross-session analysis data from the database.</div>
-            </div>
-            <button type="button" class="btn-danger-reset" id="btn-reset-data" onclick="resetAllContextData()">
-              🗑️ Clear All Context
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="/static/app.js?v=9"></script>
+  <script src="/static/app.js?v=11"></script>
 </body>
 </html>
