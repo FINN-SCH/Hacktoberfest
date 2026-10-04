@@ -53,20 +53,23 @@ const quizBadge = document.getElementById("quiz-badge");
 function switchView(viewName) {
   const voiceTab = document.getElementById("tab-voice");
   const quizTab = document.getElementById("tab-quiz");
+  const analysisTab = document.getElementById("tab-analysis");
   const voiceView = document.getElementById("view-voice");
   const quizView = document.getElementById("view-quiz");
+  const analysisView = document.getElementById("view-analysis");
 
-  if (viewName === "voice") {
-    voiceTab.classList.add("active");
-    quizTab.classList.remove("active");
-    voiceView.style.display = "block";
-    quizView.style.display = "none";
-  } else if (viewName === "quiz") {
-    quizTab.classList.add("active");
-    voiceTab.classList.remove("active");
-    voiceView.style.display = "none";
-    quizView.style.display = "block";
+  voiceTab.classList.toggle("active", viewName === "voice");
+  quizTab.classList.toggle("active", viewName === "quiz");
+  analysisTab.classList.toggle("active", viewName === "analysis");
+
+  voiceView.style.display = viewName === "voice" ? "block" : "none";
+  quizView.style.display = viewName === "quiz" ? "block" : "none";
+  analysisView.style.display = viewName === "analysis" ? "block" : "none";
+
+  if (viewName === "quiz") {
     loadQuiz(false);
+  } else if (viewName === "analysis") {
+    loadAnalysis(false);
   }
 }
 
@@ -726,6 +729,108 @@ function handleFormSubmit(e) {
   if (!text) return;
   textInput.value = "";
   quickSend(text);
+}
+
+// Cross-Session Analysis System
+let analysisData = null;
+
+async function loadAnalysis(forceRefresh = false) {
+  if (!forceRefresh && analysisData) {
+    renderAnalysis(analysisData);
+    return;
+  }
+
+  const kpiAcc = document.getElementById("kpi-accuracy");
+  const kpiTurns = document.getElementById("kpi-turns");
+  const kpiErrors = document.getElementById("kpi-errors");
+  const aiSummary = document.getElementById("ai-summary");
+
+  aiSummary.textContent = "Loading speech history and computing grammar metrics...";
+
+  try {
+    const res = await fetch(`/api/analysis?session_id=${encodeURIComponent(currentSessionId)}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    analysisData = await res.json();
+    renderAnalysis(analysisData);
+  } catch (err) {
+    console.error("Analysis load error:", err);
+    aiSummary.textContent = "Could not load analysis: " + err.message;
+  }
+}
+
+function renderAnalysis(data) {
+  document.getElementById("kpi-accuracy").textContent = `${data.accuracy_pct || 100}%`;
+  document.getElementById("kpi-turns").textContent = data.total_turns || 0;
+  document.getElementById("kpi-errors").textContent = data.total_mistakes || 0;
+  document.getElementById("kpi-sessions-sub").textContent = `Across ${data.total_sessions || 1} session(s)`;
+
+  // AI Written Diagnosis
+  const ai = data.ai_analysis || {};
+  document.getElementById("ai-summary").textContent = ai.summary || "No active speech data yet.";
+
+  const focusList = document.getElementById("ai-focus-areas");
+  focusList.innerHTML = "";
+  if (ai.focus_areas && ai.focus_areas.length > 0) {
+    ai.focus_areas.forEach(f => {
+      const el = document.createElement("div");
+      el.className = "focus-item";
+      el.innerHTML = `
+        <div class="focus-item-topic">🎯 Focus Area: ${escapeHtml(f.topic)}</div>
+        <div class="focus-item-tip">${escapeHtml(f.tip)}</div>
+      `;
+      focusList.appendChild(el);
+    });
+  }
+
+  // Topic Frequency Table
+  const tbody = document.getElementById("topic-freq-tbody");
+  tbody.innerHTML = "";
+  const topics = data.topic_frequency || [];
+
+  if (topics.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="table-empty">No grammar mistakes recorded so far! Great job.</td></tr>`;
+  } else {
+    topics.forEach(t => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><strong>${escapeHtml(t.label)}</strong></td>
+        <td>${t.errors}</td>
+        <td>${t.share_pct}%</td>
+        <td>${t.sessions}</td>
+        <td>${escapeHtml(t.last_seen)}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  // Recurring Slips
+  const recList = document.getElementById("recurring-list");
+  recList.innerHTML = "";
+  const recurring = data.recurring_mistakes || [];
+
+  if (recurring.length === 0) {
+    recList.innerHTML = `<div class="table-empty">No recurring slips detected. You rarely make the same mistake twice!</div>`;
+  } else {
+    recurring.forEach(r => {
+      const item = document.createElement("div");
+      item.className = "recurring-item";
+
+      const exHtml = (r.examples || []).map(e => `
+        <div class="recurring-ex">
+          <span class="wrong">${escapeHtml(e.original)}</span> &nbsp;➔&nbsp; <span class="right">${escapeHtml(e.corrected)}</span>
+        </div>
+      `).join("");
+
+      item.innerHTML = `
+        <div class="recurring-header">
+          <span class="recurring-topic">${escapeHtml(r.label)}</span>
+          <span class="recurring-badge">${r.count}x repeated</span>
+        </div>
+        <div class="recurring-examples">${exHtml}</div>
+      `;
+      recList.appendChild(item);
+    });
+  }
 }
 
 // Spacebar Key listener

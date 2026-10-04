@@ -69,6 +69,16 @@ def init_db():
         FOREIGN KEY (mistake_id) REFERENCES mistakes(id)
     )
     """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS written_analyses (
+        id TEXT PRIMARY KEY,
+        created_at REAL NOT NULL,
+        summary TEXT NOT NULL,
+        strengths TEXT NOT NULL,
+        focus_areas TEXT NOT NULL
+    )
+    """)
     
     conn.commit()
     conn.close()
@@ -128,7 +138,7 @@ def exclude_mistake(mistake_id: str, reason: str = "not_a_mistake") -> bool:
     conn.close()
     return updated
 
-def get_active_mistakes(session_id: Optional[str] = None, limit: int = 20) -> List[Dict[str, Any]]:
+def get_active_mistakes(session_id: Optional[str] = None, limit: int = 30) -> List[Dict[str, Any]]:
     conn = get_connection()
     query = "SELECT * FROM mistakes WHERE is_excluded = 0 AND kind = 'error'"
     params = []
@@ -160,53 +170,101 @@ def record_quiz_attempt(attempt_id: str, mistake_id: str, question_text: str, us
         )
     conn.close()
 
-def get_stats(session_id: Optional[str] = None) -> Dict[str, Any]:
+def get_analysis_data(session_id: Optional[str] = None) -> Dict[str, Any]:
+    """Computes deterministic analysis data following PLAN.md Section 8"""
     conn = get_connection()
+
+    # 1. Total sessions and turns
+    total_sessions = conn.execute("SELECT COUNT(DISTINCT id) as cnt FROM sessions").fetchone()["cnt"]
+    total_turns = conn.execute("SELECT COUNT(*) as cnt FROM turns").fetchone()["cnt"]
     
-    turn_query = "SELECT COUNT(*) as cnt FROM turns"
-    turn_params = []
-    if session_id:
-        turn_query += " WHERE session_id = ?"
-        turn_params.append(session_id)
-    total_turns = conn.execute(turn_query, turn_params).fetchone()["cnt"]
-    
-    mistake_query = "SELECT topic, COUNT(*) as cnt FROM mistakes WHERE is_excluded = 0 AND kind = 'error'"
-    mistake_params = []
-    if session_id:
-        mistake_query += " AND session_id = ?"
-        mistake_params.append(session_id)
-    mistake_query += " GROUP BY topic ORDER BY cnt DESC"
-    
-    topic_counts = conn.execute(mistake_query, mistake_params).fetchall()
-    total_mistakes = sum(r["cnt"] for r in topic_counts)
-    
-    # Error-free turns
-    # Find turns that have NO active errors
-    err_turn_query = "SELECT DISTINCT turn_id FROM mistakes WHERE is_excluded = 0 AND kind = 'error'"
-    if session_id:
-        err_turn_query += " AND session_id = ?"
-    err_turn_ids = {r[0] for r in conn.execute(err_turn_query, turn_params).fetchall()}
-    
-    error_free_turns = max(0, total_turns - len(err_turn_ids))
-    accuracy_pct = round((error_free_turns / total_turns * 100), 1) if total_turns > 0 else 100.0
-    
-    topic_breakdown = [
-        {
+    # 2. Topic frequency table
+    topic_query = """
+    SELECT topic, COUNT(*) as cnt, COUNT(DISTINCT session_id) as session_cnt, MAX(created_at) as last_seen
+    FROM mistakes
+    WHERE is_excluded = 0 AND kind = 'error'
+    GROUP BY topic
+    ORDER BY cnt DESC
+    """
+    topic_rows = conn.execute(topic_query).fetchall()
+    total_mistakes = sum(r["cnt"] for r in topic_rows)
+
+    topic_frequency = []
+    for r in topic_rows:
+        share = round((r["cnt"] / total_mistakes * 100), 1) if total_mistakes > 0 else 0
+        topic_frequency.append({
             "topic": r["topic"],
             "label": get_topic_label(r["topic"]),
-            "count": r["cnt"]
-        }
-        for r in topic_counts
-    ]
-    
+            "errors": r["cnt"],
+            "share_pct": share,
+            "sessions": r["session_cnt"],
+            "last_seen": time.strftime("%Y-%m-%d %H:%M", time.localtime(r["last_seen"])) if r["last_seen"] else "-"
+        })
+
+    # 3. Recurring mistakes (topics appearing in 2+ mistakes or sessions)
+    recurring = []
+    for r in topic_rows:
+        if r["cnt"] >= 2:
+            # Fetch recent examples
+            examples = conn.execute(
+                "SELECT original, corrected FROM mistakes WHERE is_excluded = 0 AND kind = 'error' AND topic = ? ORDER BY created_at DESC LIMIT 3",
+                (r["topic"],)
+            ).fetchall()
+            recurring.append({
+                "topic": r["topic"],
+                "label": get_topic_label(r["topic"]),
+                "count": r["cnt"],
+                "examples": [{"original": e["original"], "corrected": e["corrected"]} for e in examples]
+            })
+
+    # 4. Progress per session
+    sessions_list = conn.execute("SELECT * FROM sessions ORDER BY created_at ASC").fetchall()
+    progress_sessions = []
+    for s in sessions_list:
+        sid = s["id"]
+        s_turns = conn.execute("SELECT id, user_transcript FROM turns WHERE session_id = ?", (sid,)).fetchall()
+        s_turn_cnt = len(s_turns)
+        
+        # Count words
+        word_count = sum(len(t["user_transcript"].split()) for t in s_turns)
+        
+        # Active mistakes for session
+        s_mistakes = conn.execute("SELECT turn_id FROM mistakes WHERE session_id = ? AND is_excluded = 0 AND kind = 'error'", (sid,)).fetchall()
+        s_err_count = len(s_mistakes)
+        err_turn_ids = {m["turn_id"] for m in s_mistakes}
+        
+        error_free_turns = max(0, s_turn_cnt - len(err_turn_ids))
+        err_free_pct = round((error_free_turns / s_turn_cnt * 100), 1) if s_turn_cnt > 0 else 100.0
+        err_per_100_words = round((s_err_count / word_count * 100), 1) if word_count > 0 else 0.0
+
+        progress_sessions.append({
+            "session_id": sid,
+            "date": time.strftime("%d %b %H:%M", time.localtime(s["created_at"])),
+            "scenario": s["scenario"],
+            "level": s["level"],
+            "turns": s_turn_cnt,
+            "error_free_pct": err_free_pct,
+            "err_per_100_words": err_per_100_words,
+            "errors": s_err_count
+        })
+
+    # 5. Accuracy snapshot
+    err_turn_ids = {r[0] for r in conn.execute("SELECT DISTINCT turn_id FROM mistakes WHERE is_excluded = 0 AND kind = 'error'").fetchall()}
+    error_free_total = max(0, total_turns - len(err_turn_ids))
+    accuracy_pct = round((error_free_total / total_turns * 100), 1) if total_turns > 0 else 100.0
+
     conn.close()
     return {
+        "total_sessions": max(1, total_sessions),
         "total_turns": total_turns,
         "total_mistakes": total_mistakes,
-        "error_free_turns": error_free_turns,
         "accuracy_pct": accuracy_pct,
-        "topic_breakdown": topic_breakdown
+        "topic_frequency": topic_frequency,
+        "recurring_mistakes": recurring,
+        "progress_sessions": progress_sessions
     }
 
-# Initialize database on module load
+def get_stats(session_id: Optional[str] = None) -> Dict[str, Any]:
+    return get_analysis_data(session_id)
+
 init_db()

@@ -451,6 +451,35 @@ async def get_stats_endpoint(session_id: Optional[str] = None):
     stats = database.get_stats(session_id=session_id)
     return stats
 
+@app.get("/api/analysis")
+async def get_analysis_endpoint(session_id: Optional[str] = None):
+    data = database.get_analysis_data(session_id=session_id)
+    
+    # If there are active mistakes and at least 2 turns, provide an AI written diagnosis summary
+    ai_summary = ""
+    strengths = []
+    focus_areas = []
+
+    if data["total_mistakes"] > 0:
+        top_topics = [t["label"] for t in data["topic_frequency"][:3]]
+        ai_summary = f"Identified {data['total_mistakes']} grammar correction(s) across {data['total_turns']} spoken turns. The highest frequency areas to work on are: {', '.join(top_topics)}."
+        
+        for t in data["topic_frequency"][:3]:
+            focus_areas.append({
+                "topic": t["label"],
+                "tip": f"Review rules for {t['label']}. Focus on practicing these forms in your next spoken conversation."
+            })
+    else:
+        ai_summary = "Excellent fluency so far! Your turns have maintained a high level of grammatical accuracy."
+        strengths.append("High accuracy across recent dialogue turns.")
+
+    data["ai_analysis"] = {
+        "summary": ai_summary,
+        "strengths": strengths,
+        "focus_areas": focus_areas
+    }
+    return data
+
 @app.get("/api/tts")
 async def tts_endpoint(text: str, voice: Optional[str] = None):
     clean = clean_speech_text(text)

@@ -37,6 +37,10 @@
         <span>Practice Quiz</span>
         <span class="quiz-count-pill" id="quiz-badge" style="display:none;">0</span>
       </button>
+      <button type="button" class="nav-segment-btn" id="tab-analysis" onclick="switchView('analysis')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Analysis</span>
+      </button>
     </nav>
 
     <!-- Header Right Controls -->
@@ -181,6 +185,88 @@
         </div>
 
         <div id="quiz-cards" class="quiz-cards-grid"></div>
+      </div>
+    </div>
+
+    <!-- ANALYSIS VIEW -->
+    <div id="view-analysis" class="view-panel" style="display: none;">
+      <div class="analysis-container">
+        <!-- Overview Banner -->
+        <div class="analysis-header-banner">
+          <div>
+            <h2 class="quiz-title">Cross-Session Analysis</h2>
+            <p class="quiz-subtitle">Long-term tracking of grammar frequency, recurring slips, and fluency trends.</p>
+          </div>
+          <button type="button" class="btn-refresh-quiz" onclick="loadAnalysis(true)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span>Refresh</span>
+          </button>
+        </div>
+
+        <!-- Metric KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Error-Free Turns</div>
+            <div class="kpi-value" id="kpi-accuracy">--%</div>
+            <div class="kpi-sub">Overall grammatical consistency</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Spoken Turns</div>
+            <div class="kpi-value" id="kpi-turns">0</div>
+            <div class="kpi-sub" id="kpi-sessions-sub">Across 0 sessions</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Active Corrections</div>
+            <div class="kpi-value" id="kpi-errors">0</div>
+            <div class="kpi-sub">Excluding dismissed slips</div>
+          </div>
+        </div>
+
+        <!-- AI Coach Written Diagnosis -->
+        <div class="analysis-card" id="ai-diagnosis-card">
+          <div class="analysis-card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            <span>Coach Diagnosis & Recommendations</span>
+          </div>
+          <p class="ai-summary-text" id="ai-summary">Analyzing your speech history...</p>
+          <div class="focus-areas-list" id="ai-focus-areas"></div>
+        </div>
+
+        <!-- Topic Frequency Table -->
+        <div class="analysis-card">
+          <div class="analysis-card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Mistake Frequency by Grammar Topic</span>
+          </div>
+          <div class="table-wrap">
+            <table class="analysis-table">
+              <thead>
+                <tr>
+                  <th>Topic</th>
+                  <th>Errors</th>
+                  <th>Share</th>
+                  <th>Sessions</th>
+                  <th>Last Seen</th>
+                </tr>
+              </thead>
+              <tbody id="topic-freq-tbody">
+                <tr><td colspan="5" class="table-empty">No grammar mistakes recorded.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recurring Mistakes Breakdown -->
+        <div class="analysis-card" id="recurring-card">
+          <div class="analysis-card-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            <span>Recurring Slips</span>
+          </div>
+          <div class="recurring-list" id="recurring-list">
+            <div class="table-empty">No recurring slips detected.</div>
+          </div>
+        </div>
+
       </div>
     </div>
 
