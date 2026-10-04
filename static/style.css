@@ -48,13 +48,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
-  background: rgba(9, 13, 22, 0.85);
+  padding: 10px 20px;
+  background: rgba(9, 13, 22, 0.92);
   border-bottom: 1px solid var(--border-subtle);
   backdrop-filter: blur(14px);
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 50;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .brand-wrap {
@@ -73,6 +75,7 @@ body {
   justify-content: center;
   color: #fff;
   box-shadow: 0 0 16px rgba(99, 102, 241, 0.35);
+  flex-shrink: 0;
 }
 
 .brand-title {
@@ -80,12 +83,14 @@ body {
   font-weight: 700;
   letter-spacing: -0.2px;
   color: #fff;
+  white-space: nowrap;
 }
 
 .brand-subtitle {
   font-size: 11px;
   color: var(--text-secondary);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 /* Center Segmented Control */
@@ -96,13 +101,16 @@ body {
   border-radius: 9999px;
   padding: 3px;
   gap: 2px;
+  position: relative;
+  z-index: 60;
+  flex-shrink: 0;
 }
 
 .nav-segment-btn {
   background: transparent;
   border: none;
   color: var(--text-secondary);
-  padding: 6px 14px;
+  padding: 7px 14px;
   border-radius: 9999px;
   font-size: 12.5px;
   font-weight: 600;
@@ -111,6 +119,12 @@ body {
   align-items: center;
   gap: 6px;
   transition: all 0.18s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-segment-btn * {
+  pointer-events: none; /* ensure clicks bubble directly to the button */
 }
 
 .nav-segment-btn:hover {
@@ -964,4 +978,25 @@ body {
 .recurring-ex span.right {
   color: #34d399;
   font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .header {
+    justify-content: center;
+    padding: 10px 14px;
+  }
+  .nav-segment {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-top: 4px;
+  }
+  .nav-segment-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 8px 10px;
+  }
+  .header-controls {
+    order: 2;
+  }
 }
