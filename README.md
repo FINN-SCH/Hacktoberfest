@@ -49,12 +49,12 @@ pip install -r requirements.txt
 ### Running the App
 
 ```bash
-# Starts the server on port 5050
+# Starts the server on port 25565
 python server.py
 ```
 
 Then open your browser at:
-`http://localhost:5050`
+`http://localhost:25565`
 
 ## 📁 Architecture
 

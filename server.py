@@ -225,12 +225,32 @@ class StartSessionRequest(BaseModel):
     target_lang: Optional[str] = "en"
     native_lang: Optional[str] = "de"
 
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+
+def _asset_version(name: str) -> str:
+    try:
+        return str(int(os.path.getmtime(os.path.join(STATIC_DIR, name))))
+    except OSError:
+        return str(int(time.time()))
+
+@app.middleware("http")
+async def no_cache_static(request: Request, call_next):
+    response = await call_next(request)
+    path = request.url.path
+    if path == "/" or path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return response
+
 @app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 async def serve_index():
-    index_file = os.path.join(os.path.dirname(__file__), "static", "index.html")
+    index_file = os.path.join(STATIC_DIR, "index.html")
     if os.path.exists(index_file):
         with open(index_file, "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
+            html = f.read()
+        # Automatic cache-busting: version = file modification time
+        for asset in ("app.js", "style.css"):
+            html = re.sub(rf'/static/{re.escape(asset)}(\?v=[^"\']*)?', f"/static/{asset}?v={_asset_version(asset)}", html)
+        return HTMLResponse(content=html)
     return HTMLResponse(content="<h1>Voice Language Tutor Online</h1>")
 
 @app.get("/api/health")
@@ -730,5 +750,5 @@ app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 5050))
+    port = int(os.getenv("PORT", 25565))
     uvicorn.run(app, host="0.0.0.0", port=port)
