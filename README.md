@@ -72,3 +72,7 @@ Then open your browser at:
     ├── style.css         # Modern dark-mode UI & animated waveform
     └── app.js            # Web Audio recording, VAD, TTS queue & Quiz engine
 ```
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [`LICENSE`](./LICENSE) file for details.
