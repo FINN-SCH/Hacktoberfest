@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Env / secrets
+.env
+*.env.local
+
+# Data
+*.db
+*.db-journal
+
+# Node
+node_modules/
+frontend/dist/
+
+# Local agent state
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
