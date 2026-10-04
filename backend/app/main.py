@@ -71,7 +71,9 @@ def create_app(settings: Settings | None = None, *, frontend_dist: Path | None =
         if not candidate.is_relative_to(root) or any(part.startswith(".") for part in Path(path).parts):
             raise ApiError(404,"not_found","File not found.")
         if candidate.is_file():
-            return FileResponse(candidate)
+            # Windows MIME registry entries can label modules as text/plain.
+            media_type = {".js": "text/javascript", ".mjs": "text/javascript", ".wasm": "application/wasm"}.get(candidate.suffix.lower())
+            return FileResponse(candidate, media_type=media_type)
         if path.startswith(("assets/","vad/")) or Path(path).suffix:
             raise ApiError(404,"not_found","Asset not found.")
         index = root/"index.html"
