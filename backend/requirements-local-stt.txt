@@ -1,0 +1,4 @@
+-r requirements.txt
+# Optional local STT. Current CTranslate2 needs CUDA 12 + cuDNN 9 for GPU.
+faster-whisper==1.2.1
+ctranslate2==4.6.0
